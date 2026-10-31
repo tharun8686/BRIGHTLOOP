@@ -1,28 +1,7 @@
-# LinkedIn development notes
+# Verified development notes
 
-Use this file to prepare a factual post after verification. Nothing has been posted or sent.
+Nothing has been posted or sent. The project implements local-first subscription operations with Next.js, TypeScript and normalized SQLite, anchored recurring billing, immutable customer ownership, operational SMTP integration and external payment records.
 
-## Current shareable facts
+Evidence currently available: 18 automated tests, a four-role Chrome walkthrough, a dedicated printed invoice, concurrent billing checks, a migration rehearsal and measured local HTTP responses on 10,000 subscriptions/invoices/payments. See IMPLEMENTATION_STATUS.md and PERFORMANCE.md for exact scope and limitations.
 
-- Problem: replace fragmented spreadsheets and manual recurring-billing operations.
-- Built an initial local subscription workflow using Next.js, TypeScript and SQLite.
-- Added role-aware views, quotation progression, due-invoice generation and external payment recording.
-- Used integer monetary values and a unique subscription/period key in the initial billing implementation.
-- Chose a restrained interface with clear tables and forms.
-- Production build and five focused calculation/date tests pass.
-
-## Evidence to collect before publishing
-
-- Actual desktop and mobile screenshots, labelled when using sample records.
-- A short recording from quotation through invoice and payment.
-- Successful duplicate-billing and customer-isolation verification.
-- Team members' actual contributions and repository link.
-- Hosted URL only after deployment and verification.
-
-## Claims to avoid at this stage
-
-Do not say production-ready, fully automated, Supabase-powered, secure at scale, used by customers, under two seconds, or fully tested. Those claims are not established by the current implementation.
-
-## Suggested narrative
-
-Describe the business problem, the working flow, one concrete engineering choice, verification evidence, lessons learned and each teammate's contribution. Add the repository and demo links when available. Report limitations directly.
+Do not claim production-ready, complete acceptance, Gmail inbox delivery, every page under two seconds, deployed usage, real customers or comprehensive security certification. The actual team members and contributions are still required. No testimonials, adoption metrics or teammate commits have been fabricated.

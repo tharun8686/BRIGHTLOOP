@@ -1,144 +1,122 @@
 # Brightloop
 
-A subscription operations application for the Odoo hackathon problem statement. Brightloop brings customer records, product configuration, subscription lifecycles, recurring invoice generation and payment recording into one workspace.
+Brightloop is a local-first, self-hosted subscription operations application built with Next.js App Router, React, TypeScript and Node 24 SQLite. Payments record money collected elsewhere; this application does not charge cards or transfer funds.
 
-## Current delivery status
+## Start reviewing here
 
-This repository contains a working **local development implementation**, not a production release. Data is persisted in SQLite. Supabase packages are installed but **hosted authentication and PostgreSQL are not integrated yet**. Do not configure production customer data or deploy this build to a serverless host with ephemeral storage.
+- [Complete project flow and ten-minute demo](docs/PROJECT_FLOW.md)
+- [PDF requirement → implementation → verification checklist](docs/REQUIREMENTS_TRACEABILITY.md)
+- [Repeatable verification and GitHub CI](docs/VERIFICATION.md)
+- [Reviewer questions and code-based answers](docs/REVIEWER_QUESTIONS.md)
+- [Real email setup, explained step by step](docs/EMAIL_SETUP.md)
 
-Implemented:
+The source is formatted consistently and TypeScript rejects unused declarations. GitHub Actions runs formatting, type checking, business/security tests, real browser account-link tests against a local SMTP sink, operational browser tests and the production build. No secrets are required for CI.
 
-- First-run administrator setup, administrator-only staff account creation, customer registration, password hashing and expiring HTTP-only session cookies.
-- Admin, staff and customer permission checks on core actions; customer views filtered to the signed-in email.
-- Persistent customers, products, a product variant surcharge, plans, quotation-template records, tax-rule records and discount-rule records.
-- Subscription progression from Draft to Quotation to Confirmed to Active, with plan-dependent pause and early closure.
-- A manual billing-run trigger that creates due invoices, snapshots line amounts, applies the first eligible subscription-wide discount, records results and prevents duplicate subscription/period invoices.
-- Invoice confirmation and cancellation; browser printing / saving as PDF.
-- Partial payment recording, outstanding balance calculation and fully-paid invoice status.
-- Database-derived overview, searchable lists, filters and pagination.
-- Record activity history for implemented actions.
-- Responsive light interface and draft privacy/terms pages.
+## Status
 
-The initial browser walkthrough verified subscription creation through invoice confirmation and partial payment in a separate test database. It also checked that an immediate second billing invocation did not produce an extra invoice. This is limited evidence, not comprehensive integration coverage.
+This is an implementation under acceptance review, not a production-readiness claim. The original basic workflow has been expanded with relational storage, local account verification, invitations and recovery, billing catch-up, reminders, reversals, exports and operational tools. See [implementation status](docs/IMPLEMENTATION_STATUS.md) for verified evidence and remaining gaps. No public deployment or live external email has been performed.
 
-Still required before the agreed MVP is complete:
+## Local setup
 
-- Supabase Auth, PostgreSQL integration, migrations and row-level security.
-- Email password recovery, invoice delivery, delivery history and reminders.
-- Finalized staff permission matrix and permission integration tests.
-- Complete editing and multi-line configuration, multiple variants, product-scoped discounts and automatic tax-rule selection.
-- Apply quotation templates to new quotations, quotation validity enforcement and full renewal actions.
-- Scheduled billing, due-period catch-up, full retry semantics and calendar anchor preservation.
-- Customer self-service review, renewal worklist and a true next-invoice preview.
-- Server-side query pagination and measured performance with thousands of records. Current filtering/pagination occurs in the application after retrieval.
-- Integration/browser coverage of authorization, billing idempotency, concurrent payments and invoice lifecycle.
-- Final operator-approved legal content, backup/recovery procedures and deployment verification.
-
-See [implementation status](docs/IMPLEMENTATION_STATUS.md) for constraints and acceptance criteria. Installed packages do not imply completed integrations.
-
-## Run locally
-
-Requirements: Node.js 24 (for `node:sqlite`), npm and Git.
+Use Node.js 24 and npm on a machine with a persistent filesystem:
 
 ```sh
 npm ci
+# Copy .env.example to .env.local and set the relevant values locally.
 npm run dev
 ```
 
-Open http://127.0.0.1:3000. The first visit redirects to `/auth/setup`. Create your own administrator credentials; there are no hardcoded demo passwords. `/auth/signup` creates customer accounts only.
+Open http://127.0.0.1:3000/auth/setup to create the first administrator. Setup closes when an administrator exists. Public registration creates unverified customer accounts only. Configure SMTP to verify customers and invite staff. Never paste passwords or SMTP secrets into chat or commit them.
 
-An optional `.env.local` can be copied from `.env.example`. No external API keys are needed for the local build. The SQLite file is created automatically at `data/brightloop.sqlite` and is excluded from version control. This build does not contain a static JSON datastore or seeded financial metrics.
+The default database is `data/brightloop.sqlite`. This directory, environment files, databases, uploads, backups and test outputs are ignored by Git. The application uses node:sqlite, WAL, foreign keys, busy timeouts and integer paise. Supabase and PostgreSQL are not used; their unused packages were removed.
 
-## Commands
+## Roles and security
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Start the local development server |
-| `npm run typecheck` | Check TypeScript types |
-| `npm test` | Run five billing arithmetic and recurrence tests |
-| `npm run build` | Create the Next.js production build; this does not certify production readiness |
-| `npm start` | Run a previously built application locally |
+| Role          | Access                                                                                                         |
+| ------------- | -------------------------------------------------------------------------------------------------------------- |
+| Administrator | All operations, catalog, taxes, discounts, staff, billing and data tools                                       |
+| Staff         | Customers, quotations/subscriptions, invoices and payments; administrator may grant billing/reminder execution |
+| Customer      | Only records linked to their immutable account ID; plan-permitted lifecycle actions                            |
 
-## Project structure
+Passwords use scrypt with separate random salts, 9–128 characters, uppercase, lowercase and a special character. Email addresses are normalized. Sessions contain random opaque tokens; only SHA-256 token hashes are stored. Cookies are HTTP-only, SameSite=Lax and Secure in production. Sessions expire after 24 hours or 30 idle minutes. Verification, invitation, change-email and reset tokens are hashed, single-use and expire after 30 minutes. Password reset revokes all sessions. Password change currently revokes all sessions, including the current one. Security request counters are stored in SQLite. Server actions and routes enforce permissions; customers are never authorized merely by email matching.
 
-```text
-brightloop/
-  src/
-    app/
-      actions.ts                 Authentication and record/billing mutations
-      globals.css                Shared visual system and responsive layouts
-      layout.tsx                 Root document and metadata
-      page.tsx                   Temporary root redirect, reserved for landing page
-      auth/[mode]/page.tsx       Login, signup, first-run setup and recovery notice
-      app/
-        layout.tsx               Protected workspace shell and role-based navigation
-        page.tsx                 Overview calculated from saved records
-        [section]/page.tsx       Record lists, filters and create actions
-        [section]/[id]/page.tsx  Record details, lifecycle controls and invoice layout
-      [legal]/page.tsx           Draft privacy and terms pages
-    components/
-      forms.tsx                  Client forms and accessible Radix dialogs
-      print.tsx                  Browser print action
-    lib/
-      auth.ts                    Session lookup and authenticated route guard
-      billing.ts                 Integer-money calculations and date recurrence
-      db.ts                      SQLite connection, persistence and activity log
-  tests/billing.test.ts           Calculation and billing-date checks
-  docs/                          Architecture, status, integration and communication notes
+Migrated customer/staff accounts require verification before login. Legacy customer profiles are deliberately not linked automatically by email. An administrator must review and explicitly link appropriate portal accounts; see migration limitations in the status document.
+
+## SMTP and Gmail
+
+Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `MAIL_FROM` and `APP_URL` in the untracked environment file. Gmail commonly uses smtp.gmail.com, port 587 and SMTP_SECURE=false. Enable Google two-step verification and generate a Google app password where the account permits it. Store that app password in SMTP_PASSWORD, never the ordinary Gmail password. Other SMTP providers use the same interface.
+
+Email templates cover verification, invitation, password reset, new-address verification, invoice summary, renewal and overdue notices. Logs record attempts, safe failure information and provider message ID. Accepted means accepted by the SMTP server, not confirmed inbox delivery. Missing SMTP produces a visible unavailable/failed state. Invoice delivery can be retried from its invoice. Failed reminders can be retried from Email delivery without creating a new reminder event. Real-provider delivery still needs operator configuration and explicit authorization.
+
+## Working flow
+
+1. Create a customer, products and variants, active tax rules and a plan.
+2. Create a multi-line quotation template or subscription draft.
+3. Review copied lines, validity, payment terms and expiry. Move Draft → Quotation → Confirmed → Active.
+4. Run due billing from Overview/Billing runs. Review per-period results and retry failed subscriptions after fixing configuration.
+5. Run again: already billed periods create no duplicate invoices.
+6. Confirm an invoice, open its dedicated print page, optionally request email, then record partial/full external payments.
+7. Reverse an incorrect payment with an explicit reason and confirmation; the original entry remains.
+8. Review ageing, recurring estimates, worklists, CSV exports and customer portal views.
+
+## Billing conventions
+
+Product base price plus selected variant adjustment is multiplied by quantity. A plan price is one additional fee per billing period, not a replacement product price. Active tax rules are selected when draft lines are prepared; each rule’s name, rate and amount is snapshotted separately. One eligible discount wins: lowest priority number, then rule ID. Discounts reduce the taxable base. Product-scoped discounts reduce eligible product lines only. Fixed discounts are capped at eligible value; percentage discounts are rounded to paise. Allocated reductions sum exactly to the invoice discount, and tax rounds per rule on each line.
+
+Confirmed documents retain snapshots after catalog changes. Billing serializes each period with BEGIN IMMEDIATE, creates the invoice and consumes discount usage in the same transaction, advances the billing date, and records a run item. A unique subscription/period index prevents duplicate billing across processes. Default catch-up limit is 100 periods per subscription per run; subsequent runs continue remaining periods. Failed items identify the subscription and period; retry processes only subscriptions that failed in the selected run.
+
+Monthly/yearly recurrence retains the activation anchor, clamps short months and recovers the intended day afterward. Paused subscriptions do not bill. Resume chooses the first anchored date on or after today, skipping paused time without proration. Renewal adds an explicit number of cycles (the UI accepts 1–120, defaulting to one); closed renewal starts a new anchor today. Expiry is inclusive: periods starting on/before expiry may bill. Auto-close follows the final permitted period. A plan without auto-close stops billing beyond expiry but remains visible for operator action. Outstanding/overdue include confirmed invoices only, not drafts or cancelled invoices. Collections exclude reversals. MRR/ARR are contract estimates, not recognized accounting revenue; the dashboard explains normalization and taxes.
+
+## Commands and data operations
+
+| Command                                                              | Purpose                                                            |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| npm run typecheck                                                    | TypeScript validation                                              |
+| npm test                                                             | Business, security, concurrency, migration and loopback SMTP tests |
+| npm run build                                                        | Production compilation                                             |
+| npm start                                                            | Persistent production Node service bound to loopback               |
+| npm run data -- migrate                                              | Apply transactional migrations                                     |
+| npm run data -- health                                               | SQLite integrity and foreign-key checks                            |
+| npm run data -- backup                                               | Consistent online SQLite backup to BACKUP_PATH                     |
+| npm run data -- cleanup                                              | Remove expired sessions/tokens/counters and old delivery logs      |
+| npm run data -- schedule                                             | Billing and reminders                                              |
+| npm run seed                                                         | Explicit separate demonstration database only                      |
+| node --require ./scripts/test-register.cjs scripts/browser-check.ts  | Four-role browser walkthrough using installed Chrome               |
+| node --require ./scripts/test-register.cjs scripts/benchmark.ts      | Generate separate 10k dataset and measure service queries          |
+| node --require ./scripts/test-register.cjs scripts/http-benchmark.ts | Measure authenticated local HTTP responses on that dataset         |
+
+Before upgrading an existing database, stop application writes, create a backup, and rehearse migration on a separate copy. `scripts/migration-rehearsal.ts` uses SQLite's backup API, migrates only the copy and reports integrity. Versioned migrations run transactionally and retain the former JSON rows as `legacy_records_archive`; they never overwrite the database file. A failed migration rolls back. Keep the archive until operator review confirms all historical data is represented.
+
+Restore never overwrites a destination. Stop the service and run:
+
+```sh
+npm run data -- restore C:\absolute\backup.sqlite C:\absolute\new-restored.sqlite
 ```
 
-## Core workflow
+Set SQLITE_PATH to the new file, run health checks and start the service. Retain the former database for rollback. Backups must be kept on operator-controlled durable storage with a tested retention process. Do not copy an open WAL database as a substitute for the consistent backup command.
 
-1. Create a customer with their actual portal email.
-2. Create a product and optional variant surcharge.
-3. Create a billing plan with lifecycle permissions.
-4. Create a subscription selecting customer, plan and product.
-5. Open the subscription and progress it through quotation, confirmation and activation.
-6. Run due billing from Overview or Billing runs.
-7. Open the generated draft invoice and confirm it.
-8. Record an external payment under Payments. Partial payments preserve the remaining balance.
-9. Review the updated balance and overview. A customer account with the matching email sees its own records.
+Cleanup never deletes invoices, payments or audit events. Delivery retention defaults to 90 days (minimum 30); session/token lifetimes are fixed as described above. No file-upload feature is exposed; LOCAL_STORAGE_PATH is reserved for a future validated local attachment service.
 
-## Financial conventions
+## Scheduling and deployment
 
-- Monetary values are persisted as integer paise and displayed as INR.
-- Discounts reduce the taxable subtotal; tax is rounded per line.
-- The current implementation applies one eligible subscription-wide discount, in retrieval order. Rule ordering, stacking and product targeting are not finalized.
-- Confirmed invoices retain copied lines and amounts when catalog prices change.
-- Payments are external payment records. The application does not charge a card or move money.
-- `Payments collected` is the sum of recorded payments, not recognized accounting revenue.
-- A billing run processes one due period per active subscription. Automatic scheduling is pending.
+Run a persistent Node service with durable disk; ephemeral/serverless deployment is unsuitable. Place an HTTPS reverse proxy in front for production. Startup validates APP_URL, SQLITE_PATH, operator/legal fields, SMTP host/from and a 32-character-or-longer CRON_SECRET. Build success does not certify deployment.
 
-## Access and security
+Set SCHEDULER_ENABLED=true for the in-process interval (default hourly). Billing correctness does not depend on a browser. Alternatively create a Windows Task Scheduler task with the project as “Start in,” the Node executable as Program, and arguments:
 
-Passwords use Node scrypt with per-password salts. Session tokens are randomly generated, have a 24-hour lifetime and use HTTP-only, SameSite=Lax cookies, with Secure enabled in production. Server Actions handle mutations; inputs and authorization are checked server-side. Parameterized SQL is used for persistence.
+```text
+--env-file=.env.local --require ./scripts/test-register.cjs scripts/operations.ts schedule
+```
 
-This is not a completed security audit. Login throttling, stronger record-kind enforcement, staff administration, hosted auth, transaction-concurrency tests and comprehensive authorization coverage are release requirements. Keep the preview bound to loopback and use test data.
+Use an operator account with database access, repeat hourly, and enable retry on failure. Do not enable multiple schedulers unnecessarily. A protected POST /api/scheduler accepts `Authorization: Bearer <CRON_SECRET>` with constant-time comparison. Never put the secret in a URL or browser. OVERDUE_GRACE_DAYS controls the initial delay and OVERDUE_REMINDER_DAYS the repeat cadence (default seven days). The command/route may send transactional email once SMTP is configured; enable it only when authorized.
 
-## Landing-page integration
+## Demonstration accounts
 
-The application lives under `/app`; authentication lives under `/auth`. Your teammate can add the landing page at `src/app/page.tsx`. Use `/auth/login` for Sign in and `/auth/signup` for customer registration. See [integration contract](docs/LANDING_PAGE_INTEGRATION.md).
+Set DEMO_SQLITE_PATH to a new path whose filename begins demo-, then run npm run seed explicitly. It creates an administrator, staff member and two customers, plus clearly labelled demo catalog entries. It refuses production and existing destinations. Set a policy-compliant DEMO_PASSWORD locally or let it print random passwords once. Point SQLITE_PATH to that demo database and restart the local server to sign in with the printed development accounts. No credentials are committed; never seed the operational database automatically.
 
-## External services and deployment
+## Routes and integration
 
-The intended hosted stack is Next.js, Supabase Auth/PostgreSQL and an SMTP provider. Supabase, SMTP and scheduler credentials are deferred until the corresponding integration is implemented. No AI API or payment gateway is required. Store private credentials in `.env.local` and hosting secrets, never in source control or browser code.
+`/` remains reserved for the teammate's landing page (currently a redirect). `/auth/*` handles access; `/app/*` hosts the workspace. `/privacy` and `/terms` use operator environment values and identify missing launch information. `/app/invoices/[id]/print` is a dedicated print document. `/api/export` streams authorized filtered CSV, neutralizing spreadsheet formulas. `/api/scheduler` is a protected POST endpoint. See the landing integration contract before supplying teammate files.
 
-No public deployment has been performed. Privacy and terms are drafts. The application must pass the release requirements before launch.
+## Verification and contributors
 
-## Hackathon requirements mapping
-
-| Requirement | Evidence / current state |
-| --- | --- |
-| Dynamic data | Persistent SQLite records and server actions |
-| Clean responsive UI | Shared CSS system, tables, forms and responsive breakpoints; browser review pending |
-| Robust validation | Basic server validation implemented; broader coverage pending |
-| Clear navigation | Protected workspace and dedicated customer access |
-| Team Git participation | Team members must contribute their own meaningful commits; do not fabricate history |
-| Full subscription operations | Core local flow implemented; see remaining MVP gaps above |
-| Under two-second pages at scale | Not benchmarked; no performance claim made |
-
-## Documentation and public communication
-
-[Architecture](docs/ARCHITECTURE.md), [implementation status](docs/IMPLEMENTATION_STATUS.md), [landing-page integration](docs/LANDING_PAGE_INTEGRATION.md), and [LinkedIn development notes](docs/LINKEDIN_NOTES.md).
-
-No testimonials, customer logos, invented adoption statistics or unmeasured performance claims are included.
+See [implementation status](docs/IMPLEMENTATION_STATUS.md) for current test evidence and [performance](docs/PERFORMANCE.md) for dataset, machine and measurements. Team member names and their actual contributions have not been supplied; none are fabricated. The repository is on main. This implementation work remains reviewable in the working tree; no teammate commits or public deployment were created.

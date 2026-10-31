@@ -1,0 +1,39 @@
+name: Verify Brightloop
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BROWSER_CHANNEL: chromium
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:auth
+      - run: npm run test:browser
+      - run: npm run build
+      - name: Save non-sensitive verification summaries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-results
+          path: |
+            tmp/auth-browser-results/results.json
+            tmp/browser-results/results.json
+          if-no-files-found: ignore

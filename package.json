@@ -6,28 +6,36 @@
     "dev": "next dev --hostname 127.0.0.1",
     "build": "next build",
     "start": "next start --hostname 127.0.0.1",
-    "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/*.test.ts"
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "node --require ./scripts/test-register.cjs --test tests/*.test.ts",
+    "data": "node --env-file-if-exists=.env.local --require ./scripts/test-register.cjs scripts/operations.ts",
+    "seed": "node --env-file-if-exists=.env.local --require ./scripts/test-register.cjs scripts/seed.ts",
+    "test:browser": "node --require ./scripts/test-register.cjs scripts/browser-check.ts",
+    "benchmark": "node --require ./scripts/test-register.cjs scripts/benchmark.ts",
+    "benchmark:http": "node --require ./scripts/test-register.cjs scripts/http-benchmark.ts",
+    "migration:rehearse": "node --env-file-if-exists=.env.local --require ./scripts/test-register.cjs scripts/migration-rehearsal.ts",
+    "test:auth": "node --require ./scripts/test-register.cjs scripts/auth-browser-check.ts",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"scripts/**/*.{ts,cjs}\" \"tests/**/*.ts\" \"*.{json,ts}\" \"docs/*.md\" README.md",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"scripts/**/*.{ts,cjs}\" \"tests/**/*.ts\" \"*.{json,ts}\" \"docs/*.md\" README.md"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-dialog": "^1.1.15",
     "next": "^16.2.0",
+    "nodemailer": "^10.3.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "zod": "^4.3.0",
-    "@supabase/supabase-js": "^2.90.0",
-    "@supabase/ssr": "^0.8.0",
-    "@radix-ui/react-dialog": "^1.1.15",
     "react-hook-form": "^7.71.0",
-    "@hookform/resolvers": "^5.2.2",
-    "nodemailer": "^7.0.12",
-    "postgres": "^3.4.8"
+    "zod": "^4.3.0"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
+    "@playwright/test": "^1.64.1",
     "@types/node": "^24.10.0",
+    "@types/nodemailer": "^7.0.4",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
-    "@types/nodemailer": "^7.0.4",
-    "tsx": "^4.21.0"
+    "prettier": "^3.9.10",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }
