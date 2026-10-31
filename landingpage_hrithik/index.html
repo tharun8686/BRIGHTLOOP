@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brightloop | Subscription Operations Reimagined (Inspired by Jeton.com)</title>
+  <meta name="description" content="Centralized subscription management, recurring billing, invoices, payments, and financial intelligence in one seamless workspace with Brightloop." />
+
+  <!-- Google Fonts: Space Grotesk (Jeton-style geometric display), Plus Jakarta Sans (ultra-clean body), JetBrains Mono (financial precision) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==========================================================================
+       JETON.COM CORE DESIGN SYSTEM & DESIGN TOKENS
+       ========================================================================== */
+    :root {
+      /* Jeton Exact Signature Palette */
+      --j-orange: #F73B20;
+      --j-orange-hover: #DF2D13;
+      --j-orange-glow: rgba(247, 59, 32, 0.28);
+      --j-orange-subtle: rgba(247, 59, 32, 0.05);
+
+      --j-brown: #360802;              /* Jeton's signature deep warm brown */
+      --j-brown-80: rgba(54, 8, 2, 0.80);
+      --j-brown-55: rgba(54, 8, 2, 0.55);
+      --j-brown-25: rgba(54, 8, 2, 0.25);
+      --j-brown-10: rgba(54, 8, 2, 0.10);
+      --j-brown-05: rgba(54, 8, 2, 0.05);
+
+      --j-white: #FFFFFF;
+      --j-bg: #F7F6F3;                 /* Jeton warm stone canvas */
+      --j-bg-alt: #F0EFEC;             /* Soft warm grey concrete */
+      --j-surface: #FFFFFF;
+
+      --j-green: #34C771;              /* Supporting energetic green */
+      --j-blue: #477EE9;               /* Supporting cobalt blue */
+      --j-amber: #EAA023;              /* Due soon amber */
+
+      /* Typography */
+      --j-font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --j-font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --j-font-mono: 'JetBrains Mono', monospace;
+
+      /* Radii (Jeton rounded tokens) */
+      --j-radius-pill: 9999px;
+      --j-radius-32: 32px;
+      --j-radius-24: 24px;
+      --j-radius-20: 20px;
+      --j-radius-16: 16px;
+      --j-radius-12: 12px;
+
+      /* Multi-layered Soft Shadows */
+      --j-shadow-sm: 0 0 0 1px var(--j-brown-05), 0 2px 6px var(--j-brown-10);
+      --j-shadow-md: 0 0 0 1px var(--j-brown-05), 0 12px 32px -4px var(--j-brown-10), 0 4px 12px var(--j-brown-05);
+      --j-shadow-lg: 0 0 0 1px var(--j-brown-05), 0 24px 60px -8px rgba(54, 8, 2, 0.12), 0 8px 20px rgba(54, 8, 2, 0.06);
+      --j-shadow-float: 0 0 0 1px var(--j-brown-05), 0 32px 80px -12px rgba(54, 8, 2, 0.16);
+      --j-shadow-orange: 0 16px 40px -8px rgba(247, 59, 32, 0.38);
+
+      --j-container: 1280px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--j-font-body);
+      color: var(--j-brown);
+      background-color: var(--j-bg);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    button {
+      font-family: inherit;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    .bl-container {
+      width: 100%;
+      max-width: var(--j-container);
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    @media (min-width: 1440px) {
+      .bl-container {
+        max-width: 1340px;
+        padding: 0 36px;
+      }
+    }
+
+    /* ==========================================================================
+       JETON-STYLE PILL BUTTONS & EYEBROWS
+       ========================================================================== */
+    .bl-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--j-font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--j-orange);
+      background: rgba(247, 59, 32, 0.08);
+      padding: 7px 18px;
+      border-radius: var(--j-radius-pill);
+      margin-bottom: 24px;
+      border: 1px solid rgba(247, 59, 32, 0.16);
+    }
+
+    .bl-eyebrow.invert {
+      background: rgba(255, 255, 255, 0.14);
+      color: #FFA192;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .bl-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background-color: var(--j-orange);
+      color: var(--j-white);
+      font-family: var(--j-font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 16px 34px;
+      border-radius: var(--j-radius-pill);
+      box-shadow: var(--j-shadow-orange);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+    }
+
+    .bl-btn-primary:hover {
+      background-color: var(--j-orange-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 22px 48px -8px rgba(247, 59, 32, 0.48);
+    }
+
+    .bl-btn-primary .arrow {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .bl-btn-primary:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    .bl-btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: var(--j-white);
+      color: var(--j-brown);
+      font-family: var(--j-font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 16px 30px;
+      border-radius: var(--j-radius-pill);
+      border: 1px solid var(--j-brown-25);
+      box-shadow: var(--j-shadow-sm);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+    }
+
+    .bl-btn-secondary:hover {
+      background-color: var(--j-bg);
+      border-color: var(--j-brown);
+      transform: translateY(-2px);
+      box-shadow: var(--j-shadow-md);
+    }
+
+    .bl-btn-secondary .arrow {
+      transition: transform 0.3s ease;
+    }
+
+    .bl-btn-secondary:hover .arrow {
+      transform: translate(2px, -2px);
+    }
+
+    /* Headings */
+    .bl-hero-title {
+      font-family: var(--j-font-display);
+      font-size: clamp(3.2rem, 7.5vw, 6.8rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.045em;
+      color: var(--j-brown);
+      margin-bottom: 30px;
+    }
+
+    .bl-section-title {
+      font-family: var(--j-font-display);
+      font-size: clamp(2.4rem, 4.8vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1.02;
+      letter-spacing: -0.038em;
+      color: var(--j-brown);
+      margin-bottom: 20px;
+    }
+
+    .bl-highlight {
+      color: var(--j-orange);
+      position: relative;
+    }
+
+    .bl-lead {
+      font-size: clamp(1.15rem, 1.8vw, 1.35rem);
+      line-height: 1.6;
+      color: var(--j-brown-80);
+      max-width: 660px;
+      margin: 0 auto 38px auto;
+      font-weight: 450;
+    }
+
+    /* ==========================================================================
+       1. NAVIGATION (JETON FROSTED BLUR & AUTH MENU)
+       ========================================================================== */
+    .bl-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 22px 0;
+      transition: all 0.3s ease;
+    }
+
+    .bl-nav.scrolled {
+      padding: 14px 0;
+      background: rgba(247, 246, 243, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--j-brown-10);
+      box-shadow: 0 10px 30px -10px var(--j-brown-05);
+    }
+
+    .bl-nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .bl-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bl-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .bl-nav-link {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--j-brown-80);
+      padding: 6px 0;
+      position: relative;
+    }
+
+    .bl-nav-link:hover {
+      color: var(--j-brown);
+    }
+
+    .bl-nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background-color: var(--j-orange);
+      transition: width 0.3s ease;
+    }
+
+    .bl-nav-link:hover::after {
+      width: 100%;
+    }
+
+    .bl-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .bl-scroll-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--j-brown-55);
+      border: 1px solid var(--j-brown-10);
+      padding: 6px 14px;
+      border-radius: var(--j-radius-pill);
+      background: var(--j-white);
+    }
+
+    .bl-scroll-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--j-orange);
+      animation: pulseDot 2s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 0.4; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    .bl-mobile-toggle {
+      display: none;
+      font-size: 1.6rem;
+      color: var(--j-brown);
+    }
+
+    @media (max-width: 991px) {
+      .bl-nav-links, .bl-nav-actions { display: none; }
+      .bl-mobile-toggle { display: block; }
+    }
+
+    .bl-mobile-menu {
+      display: none;
+      position: fixed;
+      top: 76px;
+      left: 0;
+      right: 0;
+      background: #FFFFFF;
+      padding: 32px 28px;
+      border-bottom: 1px solid var(--j-brown-10);
+      box-shadow: var(--j-shadow-lg);
+      flex-direction: column;
+      gap: 20px;
+      z-index: 999;
+    }
+
+    .bl-mobile-menu.open { display: flex; }
+
+    /* ==========================================================================
+       2. HERO SECTION & FLOATING SNIPPET UNIVERSE (JETON SIGNATURE)
+       ========================================================================== */
+    .bl-hero {
+      position: relative;
+      padding-top: clamp(140px, 18vw, 190px);
+      padding-bottom: clamp(100px, 14vw, 160px);
+      overflow: visible;
+    }
+
+    .bl-hero-universe {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    /* Floating Snippet Cards surrounding the Hero Title */
+    .bl-snippet {
+      position: absolute;
+      background: #FFFFFF;
+      border-radius: var(--j-radius-20);
+      border: 1px solid var(--j-brown-10);
+      box-shadow: var(--j-shadow-lg);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 10;
+      transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease;
+      cursor: default;
+      text-align: left;
+    }
+
+    .bl-snippet:hover {
+      transform: translateY(-6px) scale(1.03);
+      box-shadow: var(--j-shadow-float);
+      border-color: rgba(247, 59, 32, 0.3);
+    }
+
+    /* Snippet Positions & Keyframe Drifts */
+    .snippet-top-left {
+      top: -30px;
+      left: -20px;
+      animation: driftA 7s ease-in-out infinite;
+    }
+
+    .snippet-top-right {
+      top: -15px;
+      right: -30px;
+      animation: driftB 8s ease-in-out infinite 1s;
+    }
+
+    .snippet-mid-left {
+      top: 140px;
+      left: -60px;
+      animation: driftB 7.5s ease-in-out infinite 2s;
+    }
+
+    .snippet-mid-right {
+      top: 150px;
+      right: -50px;
+      animation: driftA 6.5s ease-in-out infinite 1.5s;
+    }
+
+    .snippet-bottom-center {
+      bottom: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--j-brown);
+      color: #FFFFFF;
+      animation: driftC 8s ease-in-out infinite 0.5s;
+    }
+
+    @keyframes driftA {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-6px, -12px); }
+    }
+
+    @keyframes driftB {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(8px, -10px); }
+    }
+
+    @keyframes driftC {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, -8px); }
+    }
+
+    @media (max-width: 1100px) {
+      .bl-snippet { display: none; }
+    }
+
+    /* Hero Dashboard Surface */
+    .bl-hero-preview-wrap {
+      margin-top: 72px;
+      position: relative;
+      perspective: 1200px;
+    }
+
+    .bl-hero-dashboard {
+      background: #FFFFFF;
+      border-radius: var(--j-radius-32);
+      border: 1px solid var(--j-brown-10);
+      box-shadow: var(--j-shadow-float);
+      overflow: hidden;
+      transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .bl-hero-dashboard:hover {
+      transform: translateY(-4px) rotateX(1deg);
+    }
+
+    .bl-ui-header {
+      background: #110E0C;
+      color: #FFFFFF;
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .bl-ui-metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      padding: 28px;
+      background: #FAF9F7;
+      border-bottom: 1px solid var(--j-brown-10);
+    }
+
+    @media (max-width: 900px) {
+      .bl-ui-metrics-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 550px) {
+      .bl-ui-metrics-row { grid-template-columns: 1fr; }
+    }
+
+    .bl-ui-metric {
+      background: #FFFFFF;
+      padding: 20px;
+      border-radius: var(--j-radius-16);
+      border: 1px solid var(--j-brown-05);
+      box-shadow: var(--j-shadow-sm);
+      text-align: left;
+    }
+
+    /* ==========================================================================
+       3. JETON-STYLE TAGLINES MARQUEE RIBBON
+       ========================================================================== */
+    .bl-taglines-section {
+      padding: 60px 0;
+      background: #FAF9F7;
+      border-top: 1px solid var(--j-brown-10);
+      border-bottom: 1px solid var(--j-brown-10);
+    }
+
+    .bl-taglines-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    @media (max-width: 991px) {
+      .bl-taglines-grid { grid-template-columns: 1fr; }
+    }
+
+    .bl-tagline-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .bl-tagline-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--j-radius-16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    /* ==========================================================================
+       4. JETON SWITCHER & LIFECYCLE LOOP (._switcher)
+       ========================================================================== */
+    .bl-switcher-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 36px;
+    }
+
+    .bl-switcher {
+      display: inline-flex;
+      background: #EAE7E1;
+      padding: 4px;
+      border-radius: var(--j-radius-pill);
+      gap: 4px;
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .bl-switcher-btn {
+      padding: 10px 22px;
+      border-radius: var(--j-radius-pill);
+      font-family: var(--j-font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--j-brown-80);
+      transition: all 0.3s cubic-bezier(.05,.7,.1,1);
+      white-space: nowrap;
+    }
+
+    .bl-switcher-btn.active {
+      background: var(--j-orange);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(247, 59, 32, 0.4);
+    }
+
+    /* ==========================================================================
+       5. FEATURE SHOWCASE (JETON ASYMMETRIC BENTO GRID)
+       ========================================================================== */
+    .bl-bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 28px;
+      margin-top: 56px;
+    }
+
+    .bl-bento-card {
+      background: #FFFFFF;
+      border-radius: var(--j-radius-32);
+      border: 1px solid var(--j-brown-10);
+      box-shadow: var(--j-shadow-md);
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .bl-bento-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--j-shadow-lg);
+      border-color: rgba(247, 59, 32, 0.25);
+    }
+
+    .col-span-8 { grid-column: span 8; }
+    .col-span-4 { grid-column: span 4; }
+    .col-span-12 { grid-column: span 12; }
+
+    @media (max-width: 991px) {
+      .col-span-8, .col-span-4, .col-span-12 { grid-column: span 12; }
+    }
+
+    /* ==========================================================================
+       6. TRANSFORMATION MATRIX CARD
+       ========================================================================== */
+    .bl-trans-card {
+      background: #FFFFFF;
+      border-radius: var(--j-radius-32);
+      border: 1px solid var(--j-brown-10);
+      box-shadow: var(--j-shadow-lg);
+      overflow: hidden;
+      margin-top: 48px;
+    }
+
+    .bl-trans-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--j-brown-05);
+      transition: background 0.2s ease;
+    }
+
+    @media (max-width: 768px) {
+      .bl-trans-row { grid-template-columns: 1fr; }
+    }
+
+    .bl-trans-row:hover { background: #FAF9F7; }
+
+    .bl-trans-col {
+      padding: 24px 36px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .bl-trans-col.before {
+      border-right: 1px solid var(--j-brown-05);
+      color: #6E6860;
+      text-decoration: line-through rgba(54, 8, 2, 0.25);
+    }
+
+    /* ==========================================================================
+       7. FINANCIAL INTELLIGENCE DASHBOARD
+       ========================================================================== */
+    .bl-fi-dashboard {
+      background: #FFFFFF;
+      border-radius: var(--j-radius-32);
+      border: 1px solid var(--j-brown-10);
+      box-shadow: var(--j-shadow-float);
+      overflow: hidden;
+      margin-top: 56px;
+    }
+
+    .bl-fi-strip {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      background: #FAF9F7;
+      border-bottom: 1px solid var(--j-brown-10);
+    }
+
+    @media (max-width: 1100px) {
+      .bl-fi-strip { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .bl-fi-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .bl-fi-cell {
+      padding: 22px;
+      border-right: 1px solid var(--j-brown-05);
+    }
+
+    /* ==========================================================================
+       8. DESIGNED FOR EVERY ROLE
+       ========================================================================== */
+    .bl-roles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      margin-top: 56px;
+    }
+
+    @media (max-width: 991px) {
+      .bl-roles-grid { grid-template-columns: 1fr; }
+    }
+
+    .bl-role-card {
+      background: #FFFFFF;
+      border-radius: var(--j-radius-32);
+      border: 1px solid var(--j-brown-10);
+      box-shadow: var(--j-shadow-md);
+      padding: 38px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .bl-role-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--j-shadow-lg);
+    }
+
+    /* ==========================================================================
+       9. CLOSING CTA (JETON MISSION INVERT-COLOR BANNER)
+       ========================================================================== */
+    .bl-closing {
+      position: relative;
+      background-color: var(--j-orange);
+      color: #FFFFFF;
+      padding: clamp(110px, 16vw, 180px) 0;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .bl-closing-loop-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1000px;
+      height: 1000px;
+      opacity: 0.14;
+      pointer-events: none;
+      animation: rotateLoop 40s linear infinite;
+    }
+
+    @keyframes rotateLoop {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .bl-closing-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background-color: #FFFFFF;
+      color: var(--j-orange);
+      font-family: var(--j-font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      padding: 18px 44px;
+      border-radius: var(--j-radius-pill);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+      transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .bl-closing-btn:hover {
+      transform: scale(1.03) translateY(-2px);
+      background-color: #FAF9F7;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.38);
+    }
+
+    /* ==========================================================================
+       10. FOOTER
+       ========================================================================== */
+    .bl-footer {
+      background: #0E0D0C;
+      color: #FFFFFF;
+      padding: 80px 0 40px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .bl-footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1.2fr;
+      gap: 48px;
+      margin-bottom: 64px;
+    }
+
+    @media (max-width: 991px) {
+      .bl-footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 550px) {
+      .bl-footer-grid { grid-template-columns: 1fr; }
+    }
+
+    .bl-footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .bl-footer-links a {
+      color: #9E988F;
+      font-size: 0.92rem;
+    }
+
+    .bl-footer-links a:hover {
+      color: #FFFFFF;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       1. NAVIGATION BAR
+       ========================================================================== -->
+  <header class="bl-nav" id="mainNav">
+    <div class="bl-container">
+      <nav class="bl-nav-inner" aria-label="Main Navigation">
+        <!-- Brand Logo & Custom Continuous Loop Glyph -->
+        <a href="#hero" class="bl-brand" aria-label="Brightloop Home">
+          <svg viewBox="0 0 40 40" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="navLoopGrad" x1="4" y1="20" x2="36" y2="20" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#F73B20" />
+                <stop offset="50%" stop-color="#F73B20" />
+                <stop offset="100%" stop-color="#360802" />
+              </linearGradient>
+            </defs>
+            <path d="M12 28C7.58 28 4 24.42 4 20C4 15.58 7.58 12 12 12C17.5 12 22.5 28 28 28C32.42 28 36 24.42 36 20C36 15.58 32.42 12 28 12C22.5 12 17.5 28 12 28Z" stroke="url(#navLoopGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="28" cy="12" r="3.2" fill="#FFFFFF" stroke="#F73B20" stroke-width="2.5" />
+            <circle cx="12" cy="28" r="2.5" fill="#F73B20" />
+          </svg>
+          <div style="font-family: var(--j-font-display); font-size: 1.45rem; font-weight: 800; letter-spacing: -0.04em; color: var(--j-brown);">
+            <span>bright</span><span style="color: var(--j-orange);">loop</span><span style="display:inline-block; width:6px; height:6px; border-radius:50%; background: var(--j-orange); margin-left:3px;"></span>
+          </div>
+        </a>
+
+        <!-- Navigation Links -->
+        <ul class="bl-nav-links">
+          <li><a href="#platform" class="bl-nav-link">Platform</a></li>
+          <li><a href="#features" class="bl-nav-link">Features</a></li>
+          <li><a href="#lifecycle" class="bl-nav-link">How It Works</a></li>
+          <li><a href="#roles" class="bl-nav-link">For Businesses</a></li>
+        </ul>
+
+        <!-- Right Side: Scroll Indicator + Sign In + Jeton-Style CTA -->
+        <div class="bl-nav-actions">
+          <div class="bl-scroll-pill">
+            <span class="bl-scroll-dot"></span>
+            <span>v2.4 Live</span>
+          </div>
+
+          <a href="/auth/login" style="font-family: var(--j-font-display); font-size: 0.95rem; font-weight: 700; color: var(--j-brown); padding: 8px 16px;">
+            Sign In
+          </a>
+
+          <a href="/app" class="bl-btn-primary" style="padding: 12px 26px; font-size: 0.95rem;">
+            <span>Enter Brightloop</span>
+            <span class="arrow">→</span>
+          </a>
+        </div>
+
+        <button class="bl-mobile-toggle" id="mobileToggle" aria-label="Toggle menu">☰</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div class="bl-mobile-menu" id="mobileMenu">
+    <a href="#platform" class="bl-nav-link" onclick="closeMenu()">Platform</a>
+    <a href="#features" class="bl-nav-link" onclick="closeMenu()">Features</a>
+    <a href="#lifecycle" class="bl-nav-link" onclick="closeMenu()">How It Works</a>
+    <a href="#roles" class="bl-nav-link" onclick="closeMenu()">For Businesses</a>
+    <hr style="border: none; border-top: 1px solid var(--j-brown-10);" />
+    <a href="/auth/login" style="font-family: var(--j-font-display); font-weight: 700; color: var(--j-orange);">Sign In</a>
+    <a href="/app" class="bl-btn-primary" style="justify-content: center;">Enter Brightloop →</a>
+  </div>
+
+  <main>
+    <!-- ==========================================================================
+         2. HERO SECTION & FLOATING SNIPPET UNIVERSE (JETON SIGNATURE)
+         ========================================================================== -->
+    <section class="bl-hero" id="hero">
+      <div class="bl-container">
+        <div class="bl-hero-universe" id="heroUniverse">
+
+          <!-- FLOATING SNIPPET 1 (Top Left): Active Subscriptions -->
+          <div class="bl-snippet snippet-top-left">
+            <div style="width: 38px; height: 38px; border-radius: 12px; background: rgba(52, 199, 113, 0.12); color: var(--j-green); display: flex; align-items: center; justify-content: center; font-weight: 800;">
+              ↻
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; font-weight: 800; color: var(--j-green); letter-spacing: 0.05em;">ACTIVE CONTRACTS</div>
+              <div style="font-family: var(--j-font-display); font-size: 1.05rem; font-weight: 800; color: var(--j-brown);">1,428 Subscribers</div>
+              <div style="font-size: 0.72rem; color: var(--j-brown-55);">99.2% renewal retention</div>
+            </div>
+          </div>
+
+          <!-- FLOATING SNIPPET 2 (Top Right): Invoicing Snapshots -->
+          <div class="bl-snippet snippet-top-right">
+            <div style="width: 38px; height: 38px; border-radius: 12px; background: var(--j-orange-glow); color: var(--j-orange); display: flex; align-items: center; justify-content: center; font-weight: 800;">
+              📄
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; font-weight: 800; color: var(--j-orange); letter-spacing: 0.05em;">INVOICE GENERATED</div>
+              <div style="font-family: var(--j-font-mono); font-size: 0.95rem; font-weight: 700; color: var(--j-brown);">#INV-2026-092</div>
+              <div style="font-size: 0.72rem; color: var(--j-brown-55);">Snapshotted 18% GST • ₹28,320</div>
+            </div>
+          </div>
+
+          <!-- FLOATING SNIPPET 3 (Mid Left): Predictive Renewal -->
+          <div class="bl-snippet snippet-mid-left">
+            <div style="width: 38px; height: 38px; border-radius: 12px; background: rgba(234, 160, 35, 0.12); color: var(--j-amber); display: flex; align-items: center; justify-content: center; font-weight: 800;">
+              ⏱
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; font-weight: 800; color: var(--j-amber); letter-spacing: 0.05em;">PREDICTIVE RENEWAL</div>
+              <div style="font-family: var(--j-font-display); font-size: 0.92rem; font-weight: 700;">TechCorp Global (3 Days)</div>
+              <div style="font-size: 0.72rem; color: var(--j-brown-55);">Auto-anchors Feb 28 leap day</div>
+            </div>
+          </div>
+
+          <!-- FLOATING SNIPPET 4 (Mid Right): Ledger Allocation -->
+          <div class="bl-snippet snippet-mid-right">
+            <div style="width: 38px; height: 38px; border-radius: 12px; background: var(--j-orange); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800;">
+              ✓
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; font-weight: 800; color: #FFA192; letter-spacing: 0.05em;">PAYMENT ALLOCATED</div>
+              <div style="font-family: var(--j-font-display); font-size: 0.95rem; font-weight: 800;">₹48,000 Cleared</div>
+              <div style="font-size: 0.72rem; color: var(--j-brown-55);">Bank Wire • Reconciled</div>
+            </div>
+          </div>
+
+          <!-- Hero Central Narrative -->
+          <div class="bl-eyebrow">
+            <span>SUBSCRIPTION MANAGEMENT, REIMAGINED</span>
+          </div>
+
+          <h1 class="bl-hero-title">
+            Every subscription.<br />
+            <span class="bl-highlight">One seamless flow.</span>
+          </h1>
+
+          <p class="bl-lead">
+            From the first quotation to recurring invoices and payments, Brightloop brings your entire subscription business together in one intelligent workspace.
+          </p>
+
+          <div style="display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+            <a href="#platform" class="bl-btn-primary">
+              <span>Explore Brightloop</span>
+              <span class="arrow">→</span>
+            </a>
+            <a href="/app" class="bl-btn-secondary">
+              <span>Enter Your Workspace</span>
+              <span class="arrow">↗</span>
+            </a>
+          </div>
+
+          <p style="font-size: 0.95rem; font-weight: 600; color: var(--j-brown-55); letter-spacing: 0.02em;">
+            One platform. Complete subscription visibility.
+          </p>
+        </div>
+
+        <!-- Layered 3D Dashboard Mockup Surface -->
+        <div class="bl-hero-preview-wrap">
+          <div class="bl-hero-dashboard">
+            <!-- Workspace Bar -->
+            <div class="bl-ui-header">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 30px; height: 30px; border-radius: 8px; background: var(--j-orange); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: #FFFFFF;">B</div>
+                <div>
+                  <div style="font-family: var(--j-font-display); font-weight: 800; font-size: 1rem;">Brightloop Production Console</div>
+                  <div style="font-size: 0.74rem; color: #9E988F;">Acme Operations Workspace • Relational SQLite WAL Engine</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: #34C771; background: rgba(52,199,113,0.15); padding: 5px 12px; border-radius: 999px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #34C771; box-shadow: 0 0 6px #34C771;"></span>
+                <span>Real-time Billing Engine Active</span>
+              </div>
+            </div>
+
+            <!-- Metrics Row -->
+            <div class="bl-ui-metrics-row">
+              <div class="bl-ui-metric">
+                <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: var(--j-brown-55); letter-spacing: 0.06em; margin-bottom: 6px;">MONTHLY RECURRING (MRR)</div>
+                <div style="font-family: var(--j-font-display); font-size: 1.7rem; font-weight: 800; color: var(--j-brown);">₹4,85,000</div>
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--j-green); margin-top: 4px;">▲ +18.4% from last month</div>
+              </div>
+
+              <div class="bl-ui-metric">
+                <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: var(--j-brown-55); letter-spacing: 0.06em; margin-bottom: 6px;">ACTIVE SUBSCRIPTIONS</div>
+                <div style="font-family: var(--j-font-display); font-size: 1.7rem; font-weight: 800; color: var(--j-brown);">1,428</div>
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--j-blue); margin-top: 4px;">↻ 99.2% renewal retention</div>
+              </div>
+
+              <div class="bl-ui-metric">
+                <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: var(--j-brown-55); letter-spacing: 0.06em; margin-bottom: 6px;">REVENUE COLLECTED</div>
+                <div style="font-family: var(--j-font-display); font-size: 1.7rem; font-weight: 800; color: var(--j-brown);">₹42,10,000</div>
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--j-green); margin-top: 4px;">✓ 94.6% collection efficiency</div>
+              </div>
+
+              <div class="bl-ui-metric">
+                <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: var(--j-brown-55); letter-spacing: 0.06em; margin-bottom: 6px;">OUTSTANDING INVOICES</div>
+                <div style="font-family: var(--j-font-display); font-size: 1.7rem; font-weight: 800; color: var(--j-brown);">₹1,85,000</div>
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--j-amber); margin-top: 4px;">⏱ 4 due this week</div>
+              </div>
+            </div>
+
+            <!-- Dashboard Split View -->
+            <div style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 24px; padding: 28px; background: #FFFFFF;">
+              <!-- Wave Chart -->
+              <div style="background: #FAF9F7; border-radius: var(--j-radius-20); padding: 24px; border: 1px solid var(--j-brown-05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                  <div>
+                    <div style="font-family: var(--j-font-display); font-weight: 800; font-size: 1.05rem;">Recurring Revenue Momentum</div>
+                    <div style="font-size: 0.8rem; color: var(--j-brown-55);">Trailing 6 months • Clamped short months & integer paise</div>
+                  </div>
+                  <div style="font-family: var(--j-font-mono); font-size: 0.8rem; font-weight: 800; color: var(--j-orange); background: rgba(247,59,32,0.08); padding: 4px 12px; border-radius: 999px;">
+                    ARR: ₹58.20L
+                  </div>
+                </div>
+
+                <svg viewBox="0 0 600 170" style="width: 100%; height: 170px; overflow: visible;">
+                  <defs>
+                    <linearGradient id="jetonGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#F73B20" stop-opacity="0.25" />
+                      <stop offset="100%" stop-color="#F73B20" stop-opacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <line x1="0" y1="40" x2="600" y2="40" stroke="#EAE7E1" stroke-dasharray="4 4" />
+                  <line x1="0" y1="90" x2="600" y2="90" stroke="#EAE7E1" stroke-dasharray="4 4" />
+                  <line x1="0" y1="140" x2="600" y2="140" stroke="#EAE7E1" stroke-dasharray="4 4" />
+                  <path d="M0 150 Q 120 120, 240 95 T 480 50 T 600 25 L 600 165 L 0 165 Z" fill="url(#jetonGrad)" />
+                  <path d="M0 150 Q 120 120, 240 95 T 480 50 T 600 25" fill="none" stroke="#F73B20" stroke-width="4" stroke-linecap="round" />
+                  <circle cx="240" cy="95" r="5" fill="#FFFFFF" stroke="#F73B20" stroke-width="3.5" />
+                  <circle cx="480" cy="50" r="5" fill="#FFFFFF" stroke="#F73B20" stroke-width="3.5" />
+                  <circle cx="600" cy="25" r="7" fill="#F73B20" stroke="#FFFFFF" stroke-width="3" />
+                </svg>
+
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-family: var(--j-font-mono); color: var(--j-brown-55); margin-top: 10px;">
+                  <span>MAY</span><span>JUN</span><span>JUL</span><span>AUG</span><span>SEP</span><span style="color: var(--j-orange); font-weight: 800;">OCT (CURRENT)</span>
+                </div>
+              </div>
+
+              <!-- Stream -->
+              <div style="background: #FAF9F7; border-radius: var(--j-radius-20); padding: 24px; border: 1px solid var(--j-brown-05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                  <div style="font-family: var(--j-font-display); font-weight: 800; font-size: 1.05rem;">Lifecycle Stream</div>
+                  <span style="font-size: 0.72rem; font-family: var(--j-font-mono); color: var(--j-green); background: rgba(52,199,113,0.12); padding: 3px 8px; border-radius: 4px; font-weight: 700;">SYNCED</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <div style="background: #FFFFFF; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--j-brown-05); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-size: 0.85rem; font-weight: 700;">Quote #Q-2026-904 Active</div>
+                      <div style="font-size: 0.74rem; color: var(--j-brown-55);">Enterprise Annual • Acme Global</div>
+                    </div>
+                    <span style="font-family: var(--j-font-mono); font-size: 0.85rem; font-weight: 800;">₹1,20,000</span>
+                  </div>
+                  <div style="background: #FFFFFF; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--j-brown-05); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-size: 0.85rem; font-weight: 700;">Invoice #INV-2026-089 Issued</div>
+                      <div style="font-size: 0.74rem; color: var(--j-brown-55);">Linked to Subscription SUB-390</div>
+                    </div>
+                    <span style="font-family: var(--j-font-mono); font-size: 0.85rem; font-weight: 800;">₹34,800</span>
+                  </div>
+                  <div style="background: #FFFFFF; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--j-brown-05); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-size: 0.85rem; font-weight: 700;">Billing Run #402 Complete</div>
+                      <div style="font-size: 0.74rem; color: var(--j-brown-55);">38 recurring periods caught up</div>
+                    </div>
+                    <span style="font-size: 0.72rem; font-weight: 800; color: var(--j-green); background: rgba(52,199,113,0.12); padding: 3px 8px; border-radius: 6px;">0 FAILS</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 24px;">
+          <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 600; color: var(--j-brown-55); background: var(--j-brown-05); padding: 6px 18px; border-radius: var(--j-radius-pill);">
+            🛡️ Product preview with illustrative demo data. Designed for local-first SQLite business operations.
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         3. JETON-STYLE TAGLINES MARQUEE RIBBON
+         ========================================================================== -->
+    <section class="bl-taglines-section">
+      <div class="bl-container">
+        <div class="bl-taglines-grid">
+          <div class="bl-tagline-item">
+            <div class="bl-tagline-icon" style="background: rgba(52,199,113,0.12); color: var(--j-green);">✓</div>
+            <div>
+              <div style="font-family: var(--j-font-display); font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Relational Single Source</div>
+              <p style="font-size: 0.9rem; color: var(--j-brown-80);">Centralized SQLite storage eliminates duplicate spreadsheets and missing records.</p>
+            </div>
+          </div>
+
+          <div class="bl-tagline-item">
+            <div class="bl-tagline-icon" style="background: rgba(247,59,32,0.1); color: var(--j-orange);">⚡</div>
+            <div>
+              <div style="font-family: var(--j-font-display); font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Zero Double Billing</div>
+              <p style="font-size: 0.9rem; color: var(--j-brown-80);">Atomic database transactions with unique subscription-period indexes prevent duplicate invoices.</p>
+            </div>
+          </div>
+
+          <div class="bl-tagline-item">
+            <div class="bl-tagline-icon" style="background: rgba(71,126,233,0.12); color: var(--j-blue);">★</div>
+            <div>
+              <div style="font-family: var(--j-font-display); font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">Integer-Paise Precision</div>
+              <p style="font-size: 0.9rem; color: var(--j-brown-80);">Snapshotted tax and discount rules ensure exact calculations without floating-point errors.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         4. PRODUCT INTRODUCTION ("MEET BRIGHTLOOP")
+         ========================================================================== -->
+    <section class="bl-section" id="platform" style="padding: 120px 0;">
+      <div class="bl-container">
+        <div style="text-align: center; max-width: 820px; margin: 0 auto 64px auto;">
+          <div class="bl-eyebrow">MEET BRIGHTLOOP</div>
+          <h2 class="bl-section-title">Less administration.<br />More business in motion.</h2>
+          <p class="bl-lead">
+            Subscription operations shouldn't be scattered across spreadsheets, invoices, and disconnected records. Brightloop gives your team one clear place to manage customers, subscriptions, billing, and payments.
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;">
+          <!-- App Mockup Window -->
+          <div style="background: #FFFFFF; border-radius: var(--j-radius-32); border: 1px solid var(--j-brown-10); box-shadow: var(--j-shadow-lg); overflow: hidden;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; background: #F0EFEC; border-bottom: 1px solid var(--j-brown-05);">
+              <div style="display: flex; gap: 6px;">
+                <span style="width: 10px; height: 10px; border-radius: 50%; background: #FF5F56;"></span>
+                <span style="width: 10px; height: 10px; border-radius: 50%; background: #FFBD2E;"></span>
+                <span style="width: 10px; height: 10px; border-radius: 50%; background: #27C93F;"></span>
+              </div>
+              <span style="font-family: var(--j-font-mono); font-size: 0.75rem; color: var(--j-brown-55); background: #FFFFFF; padding: 3px 14px; border-radius: 999px;">brightloop.local/app/subscriptions</span>
+              <div style="width: 32px;"></div>
+            </div>
+
+            <div style="padding: 28px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                  <h3 style="font-family: var(--j-font-display); font-size: 1.2rem; font-weight: 800;">Subscription Workspace</h3>
+                  <div style="font-size: 0.8rem; color: var(--j-brown-55);">1,428 active contracts under management</div>
+                </div>
+                <span style="font-size: 0.75rem; font-weight: 800; color: var(--j-orange); background: rgba(247,59,32,0.08); padding: 5px 12px; border-radius: 999px;">Real-Time Status</span>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #FFF7F5; border: 1px solid #FFA192; padding: 14px 18px; border-radius: var(--j-radius-16);">
+                  <div>
+                    <div style="font-family: var(--j-font-mono); font-size: 0.82rem; font-weight: 800;">SUB-8092 • Apex Logistics Ltd</div>
+                    <div style="font-size: 0.76rem; color: var(--j-brown-55);">Enterprise Fleet Plan • Monthly Cadence</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-weight: 800; font-size: 0.95rem;">₹1,45,000 / yr</div>
+                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--j-green); background: rgba(52,199,113,0.12); padding: 2px 8px; border-radius: 999px;">Active</span>
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #FAF9F7; border: 1px solid var(--j-brown-05); padding: 14px 18px; border-radius: var(--j-radius-16);">
+                  <div>
+                    <div style="font-family: var(--j-font-mono); font-size: 0.82rem; font-weight: 800;">SUB-8091 • Hyperion Labs</div>
+                    <div style="font-size: 0.76rem; color: var(--j-brown-55);">Dedicated Cloud AI • Quarterly Cadence</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-weight: 800; font-size: 0.95rem;">₹38,000 / mo</div>
+                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--j-green); background: rgba(52,199,113,0.12); padding: 2px 8px; border-radius: 999px;">Active</span>
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #FAF9F7; border: 1px solid var(--j-brown-05); padding: 14px 18px; border-radius: var(--j-radius-16);">
+                  <div>
+                    <div style="font-family: var(--j-font-mono); font-size: 0.82rem; font-weight: 800;">SUB-8089 • Vertex Studios</div>
+                    <div style="font-size: 0.76rem; color: var(--j-brown-55);">Developer Team • Monthly Cadence</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-weight: 800; font-size: 0.95rem;">₹16,500 / mo</div>
+                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--j-amber); background: rgba(234,160,35,0.12); padding: 2px 8px; border-radius: 999px;">Renews in 2d</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Callout Cards with Hover Morph -->
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="bl-ui-metric" style="border-left: 4px solid var(--j-orange); cursor: default;">
+              <h4 style="font-family: var(--j-font-display); font-size: 1.15rem; font-weight: 800; color: var(--j-orange); margin-bottom: 6px;">Know what's active.</h4>
+              <p style="font-size: 0.92rem; color: var(--j-brown-80);">Instant clarity on every subscription status, activation date, and cycle cadence. Server state machines enforce strict lifecycle rules.</p>
+            </div>
+            <div class="bl-ui-metric" style="border-left: 4px solid var(--j-brown); cursor: default;">
+              <h4 style="font-family: var(--j-font-display); font-size: 1.15rem; font-weight: 800; margin-bottom: 6px;">See what's due next.</h4>
+              <p style="font-size: 0.92rem; color: var(--j-brown-80);">Predictive renewal engines anchor contract dates, clamp short months to Feb 28, and dispatch timely notifications.</p>
+            </div>
+            <div class="bl-ui-metric" style="border-left: 4px solid var(--j-blue); cursor: default;">
+              <h4 style="font-family: var(--j-font-display); font-size: 1.15rem; font-weight: 800; margin-bottom: 6px;">Keep billing connected.</h4>
+              <p style="font-size: 0.92rem; color: var(--j-brown-80);">Invoices generate directly from subscription rules with snapshotted tax percentages and capped discounts.</p>
+            </div>
+            <div class="bl-ui-metric" style="border-left: 4px solid var(--j-green); cursor: default;">
+              <h4 style="font-family: var(--j-font-display); font-size: 1.15rem; font-weight: 800; margin-bottom: 6px;">Understand your revenue.</h4>
+              <p style="font-size: 0.92rem; color: var(--j-brown-80);">Normalized MRR and ARR contract estimates calculated with integer-paise accuracy to eliminate decimal rounding errors.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         5. THE TRANSFORMATION (PROBLEM VS SOLUTION)
+         ========================================================================== -->
+    <section class="bl-section" id="transformation" style="padding-bottom: 120px;">
+      <div class="bl-container">
+        <div style="text-align: center; max-width: 820px; margin: 0 auto 56px auto;">
+          <div class="bl-eyebrow">A BETTER WAY TO WORK</div>
+          <h2 class="bl-section-title">Stop managing subscriptions<br />the hard way.</h2>
+          <p class="bl-lead">
+            Subscription businesses lose thousands in revenue leaks, missed renewals, and manual billing errors. See how Brightloop transforms fragmented operations into an effortless flow.
+          </p>
+        </div>
+
+        <div class="bl-trans-card">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--j-brown-10); font-family: var(--j-font-display); font-size: 1.2rem; font-weight: 800;">
+            <div style="padding: 24px 36px; background: #F8F7F4; color: #7A756E; border-right: 1px solid var(--j-brown-10);">
+              ❌ Traditional Manual Operations
+            </div>
+            <div style="padding: 24px 36px; background: #FFF7F5; color: var(--j-orange);">
+              ✅ With Brightloop Workspace
+            </div>
+          </div>
+
+          <div class="bl-trans-row">
+            <div class="bl-trans-col before">Spreadsheet-based subscription tracking across desynced files</div>
+            <div class="bl-trans-col" style="font-weight: 700;">Centralized subscription records with immutable relational IDs</div>
+          </div>
+          <div class="bl-trans-row">
+            <div class="bl-trans-col before">Manually checking renewal dates and missing customer renewals</div>
+            <div class="bl-trans-col" style="font-weight: 700;">Clear renewal and expiry visibility with automated reminder triggers</div>
+          </div>
+          <div class="bl-trans-row">
+            <div class="bl-trans-col before">Creating invoices one by one with manual copy-paste errors</div>
+            <div class="bl-trans-col" style="font-weight: 700;">Subscription-linked invoice generation with snapshotted tax rules</div>
+          </div>
+          <div class="bl-trans-row">
+            <div class="bl-trans-col before">Separately tracking payments across bank slips & spreadsheets</div>
+            <div class="bl-trans-col" style="font-weight: 700;">Payments connected directly to invoices with audited reversals</div>
+          </div>
+          <div class="bl-trans-row">
+            <div class="bl-trans-col before">Manually preparing financial reports and guessing MRR totals</div>
+            <div class="bl-trans-col" style="font-weight: 700;">Financial insights in one dashboard with integer-paise precision</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         6. THE CONTINUOUS SUBSCRIPTION LIFECYCLE (JETON-STYLE SWITCHER)
+         ========================================================================== -->
+    <section class="bl-section" id="lifecycle" style="padding: 120px 0; background: var(--j-white); border-top: 1px solid var(--j-brown-10); border-bottom: 1px solid var(--j-brown-10);">
+      <div class="bl-container">
+        <div style="text-align: center; max-width: 820px; margin: 0 auto 52px auto;">
+          <div class="bl-eyebrow">THE COMPLETE LIFECYCLE</div>
+          <h2 class="bl-section-title">Every stage connected.<br />Every detail in sync.</h2>
+          <p class="bl-lead">
+            Brightloop brings your subscription operations into one continuous workflow, from setting up a product to tracking its recurring revenue.
+          </p>
+        </div>
+
+        <!-- Jeton-Style Switcher -->
+        <div class="bl-switcher-wrap">
+          <div class="bl-switcher">
+            <button class="bl-switcher-btn active" onclick="switchStage(0)">01 Products & Plans</button>
+            <button class="bl-switcher-btn" onclick="switchStage(1)">02 Quotations</button>
+            <button class="bl-switcher-btn" onclick="switchStage(2)">03 Subscriptions</button>
+            <button class="bl-switcher-btn" onclick="switchStage(3)">04 Invoices</button>
+            <button class="bl-switcher-btn" onclick="switchStage(4)">05 Payments</button>
+            <button class="bl-switcher-btn" onclick="switchStage(5)">06 Insights</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Stage Display Surface -->
+        <div id="stageCanvas" style="background: #FAF9F7; border-radius: var(--j-radius-32); border: 1px solid var(--j-brown-10); padding: 52px; box-shadow: var(--j-shadow-lg); display: grid; grid-template-columns: 1fr 1.2fr; gap: 48px; align-items: center;">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         7. FEATURE SHOWCASE (ASYMMETRICAL BENTO GRID)
+         ========================================================================== -->
+    <section class="bl-section" id="features" style="padding: 130px 0;">
+      <div class="bl-container">
+        <div style="text-align: center; max-width: 820px; margin: 0 auto 64px auto;">
+          <div class="bl-eyebrow">BUILT FOR THE WAY BUSINESS WORKS</div>
+          <h2 class="bl-section-title">Everything your subscription<br />business needs.</h2>
+          <p class="bl-lead">
+            From single-seat startups to enterprise recurring operations, Brightloop coordinates every stage into a unified, high-performance system.
+          </p>
+        </div>
+
+        <div class="bl-bento-grid">
+          <!-- Card 1: Subscription Control (Span 8) -->
+          <div class="bl-bento-card col-span-8">
+            <div>
+              <div style="font-family: var(--j-font-mono); font-size: 0.8rem; font-weight: 800; color: var(--j-orange); margin-bottom: 10px;">01 / LIFECYCLE MANAGEMENT</div>
+              <h3 style="font-family: var(--j-font-display); font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;">Subscription Control</h3>
+              <p style="font-size: 0.98rem; color: var(--j-brown-80); line-height: 1.6;">
+                Manage every subscription from activation to renewal. Keep dates, statuses, and customer details organized in one unified relational database.
+              </p>
+            </div>
+
+            <div style="margin-top: 28px; background: #FAF9F7; border: 1px solid var(--j-brown-05); border-radius: var(--j-radius-20); padding: 20px;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.72rem; font-weight: 800; color: var(--j-brown-55); text-transform: uppercase; margin-bottom: 12px;">
+                <span>SUBSCRIPTION & CUSTOMER</span><span>STATUS & RENEWAL</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; padding: 12px 16px; border-radius: var(--j-radius-12); border: 1px solid var(--j-brown-05);">
+                  <div>
+                    <strong style="font-family: var(--j-font-mono); font-size: 0.82rem; color: var(--j-orange);">SUB-2041</strong>
+                    <span style="font-size: 0.9rem; font-weight: 700; margin-left: 8px;">Apex Cloud Solutions</span>
+                  </div>
+                  <span style="font-size: 0.72rem; font-weight: 800; color: var(--j-green); background: rgba(52,199,113,0.12); padding: 3px 10px; border-radius: 999px;">Active • Renews Nov 14</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; padding: 12px 16px; border-radius: var(--j-radius-12); border: 1px solid var(--j-brown-05);">
+                  <div>
+                    <strong style="font-family: var(--j-font-mono); font-size: 0.82rem; color: var(--j-orange);">SUB-2038</strong>
+                    <span style="font-size: 0.9rem; font-weight: 700; margin-left: 8px;">Nova Digital Agency</span>
+                  </div>
+                  <span style="font-size: 0.72rem; font-weight: 800; color: var(--j-amber); background: rgba(234,160,35,0.12); padding: 3px 10px; border-radius: 999px;">Renewal Due • 4 Days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Automated Billing (Span 4) -->
+          <div class="bl-bento-card col-span-4">
+            <div>
+              <div style="font-family: var(--j-font-mono); font-size: 0.8rem; font-weight: 800; color: var(--j-orange); margin-bottom: 10px;">02 / INVOICE ENGINE</div>
+              <h3 style="font-family: var(--j-font-display); font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;">Automated Billing</h3>
+              <p style="font-size: 0.98rem; color: var(--j-brown-80); line-height: 1.6;">
+                Keep recurring billing organized and generate invoices directly from subscription parameters and schedules.
+              </p>
+            </div>
+
+            <div style="margin-top: 28px; background: #FAF9F7; border: 1px solid var(--j-brown-05); border-radius: var(--j-radius-20); padding: 20px;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.78rem; border-bottom: 1px solid #EAE7E1; padding-bottom: 8px; margin-bottom: 10px;">
+                <span style="font-family: var(--j-font-mono); font-weight: 800;">#INV-2026-092</span>
+                <span style="color: var(--j-green); font-weight: 800;">CONFIRMED</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem;">
+                <div style="display: flex; justify-content: space-between;"><span style="color: var(--j-brown-55);">Pro Tier (1 License)</span><span>₹24,000.00</span></div>
+                <div style="display: flex; justify-content: space-between;"><span style="color: var(--j-brown-55);">Snapshotted GST (18%)</span><span>₹4,320.00</span></div>
+                <div style="display: flex; justify-content: space-between; border-top: 1px dashed #EAE7E1; padding-top: 8px; margin-top: 6px; font-weight: 800;">
+                  <span>Invoice Total</span><span style="color: var(--j-orange);">₹28,320.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Flexible Plans (Span 4) -->
+          <div class="bl-bento-card col-span-4">
+            <div>
+              <div style="font-family: var(--j-font-mono); font-size: 0.8rem; font-weight: 800; color: var(--j-orange); margin-bottom: 10px;">03 / CADENCE RULES</div>
+              <h3 style="font-family: var(--j-font-display); font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;">Flexible Plans</h3>
+              <p style="font-size: 0.98rem; color: var(--j-brown-80); line-height: 1.6;">
+                Create daily, weekly, monthly, or yearly plans with flexible pricing, variant adjustments, and lifecycle rules.
+              </p>
+            </div>
+
+            <div style="margin-top: 28px; background: #FAF9F7; border: 1px solid var(--j-brown-05); border-radius: var(--j-radius-20); padding: 20px;">
+              <div style="display: flex; background: #EAE7E1; border-radius: 999px; padding: 3px; margin-bottom: 12px;">
+                <button onclick="setPlan(this, '₹14,500 / mo')" style="flex:1; padding: 6px; font-size: 0.78rem; font-weight: 800; background: #FFFFFF; border-radius: 999px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">Monthly</button>
+                <button onclick="setPlan(this, '₹1,47,900 / yr')" style="flex:1; padding: 6px; font-size: 0.78rem; font-weight: 800; background: transparent; border-radius: 999px;">Yearly (-15%)</button>
+              </div>
+              <div style="font-size: 0.78rem; color: var(--j-brown-55);">Enterprise Workspace Tier</div>
+              <div style="font-family: var(--j-font-display); font-size: 1.45rem; font-weight: 800; color: var(--j-brown);" id="planPrice">₹14,500 / mo</div>
+              <div style="font-size: 0.72rem; color: var(--j-green); font-weight: 700; margin-top: 4px;">✓ Leap-day & month-end anchor clamped</div>
+            </div>
+          </div>
+
+          <!-- Card 4: Payment Tracking (Span 4) -->
+          <div class="bl-bento-card col-span-4">
+            <div>
+              <div style="font-family: var(--j-font-mono); font-size: 0.8rem; font-weight: 800; color: var(--j-orange); margin-bottom: 10px;">04 / LEDGER ALLOCATION</div>
+              <h3 style="font-family: var(--j-font-display); font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;">Payment Tracking</h3>
+              <p style="font-size: 0.98rem; color: var(--j-brown-80); line-height: 1.6;">
+                Connect payment records to invoices and maintain a clear view of what has been collected and what remains due.
+              </p>
+            </div>
+
+            <div style="margin-top: 28px; background: #FAF9F7; border: 1px solid var(--j-brown-05); border-radius: var(--j-radius-20); padding: 20px;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 800; margin-bottom: 8px;">
+                <span>PAY-9042 • Bank NEFT</span><span style="color: var(--j-green);">RECONCILED</span>
+              </div>
+              <div style="font-size: 0.85rem; color: var(--j-brown-80);">Amount: <strong>₹48,000.00</strong> applied to #INV-2026-074</div>
+              <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #EAE7E1; font-size: 0.8rem; display: flex; justify-content: space-between;">
+                <span>Remaining Due:</span><strong style="color: var(--j-green);">₹0.00 (Cleared)</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 5: Customer Portal (Span 4) -->
+          <div class="bl-bento-card col-span-4">
+            <div>
+              <div style="font-family: var(--j-font-mono); font-size: 0.8rem; font-weight: 800; color: var(--j-orange); margin-bottom: 10px;">05 / SELF-SERVICE</div>
+              <h3 style="font-family: var(--j-font-display); font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;">Customer Portal</h3>
+              <p style="font-size: 0.98rem; color: var(--j-brown-80); line-height: 1.6;">
+                Give customers a convenient place to review their subscriptions and download their invoices independently.
+              </p>
+            </div>
+
+            <div style="margin-top: 28px; background: #FAF9F7; border: 1px solid var(--j-brown-05); border-radius: var(--j-radius-20); padding: 20px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                <span style="width: 24px; height: 24px; border-radius: 50%; background: var(--j-orange); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800;">C</span>
+                <span style="font-size: 0.85rem; font-weight: 800;">Subscriber Portal</span>
+              </div>
+              <div style="font-size: 0.82rem; color: var(--j-brown-80);">Active Plan: <strong>Developer Team Seat</strong></div>
+              <div style="margin-top: 10px; display: flex; justify-content: space-between; font-size: 0.78rem;">
+                <span>INV-2026-081</span><span style="color: var(--j-orange); font-weight: 700;">📥 Download Statement</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 6: Revenue Intelligence (Span 12) -->
+          <div class="bl-bento-card col-span-12">
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 36px; align-items: center;">
+              <div>
+                <div style="font-family: var(--j-font-mono); font-size: 0.8rem; font-weight: 800; color: var(--j-orange); margin-bottom: 10px;">06 / FINANCIAL INTELLIGENCE</div>
+                <h3 style="font-family: var(--j-font-display); font-size: 1.8rem; font-weight: 800; margin-bottom: 8px;">Revenue Intelligence</h3>
+                <p style="font-size: 1rem; color: var(--j-brown-80); line-height: 1.6; margin-bottom: 24px;">
+                  Monitor recurring revenue, active subscriptions, collections, and overdue invoices in one place with normalized contract metrics.
+                </p>
+
+                <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+                  <div>
+                    <div style="font-size: 0.74rem; font-weight: 800; color: var(--j-brown-55);">MONTHLY RUN RATE</div>
+                    <div style="font-family: var(--j-font-display); font-size: 1.75rem; font-weight: 800;">₹4,85,000</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 0.74rem; font-weight: 800; color: var(--j-brown-55);">ANNUALIZED ARR</div>
+                    <div style="font-family: var(--j-font-display); font-size: 1.75rem; font-weight: 800; color: var(--j-orange);">₹58,20,000</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 0.74rem; font-weight: 800; color: var(--j-brown-55);">COLLECTION EFFICIENCY</div>
+                    <div style="font-family: var(--j-font-display); font-size: 1.75rem; font-weight: 800; color: var(--j-green);">94.6%</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cohort sparklines -->
+              <div style="background: #FAF9F7; border-radius: var(--j-radius-20); padding: 24px; border: 1px solid var(--j-brown-05);">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 16px;">
+                  <span>Quarterly Renewal Retention</span>
+                  <span style="color: var(--j-green);">99.2% Retained</span>
+                </div>
+                <div style="display: flex; align-items: flex-end; gap: 10px; height: 90px;">
+                  <div style="flex: 1; height: 35%; background: #DFDBD5; border-radius: 4px 4px 0 0;"></div>
+                  <div style="flex: 1; height: 50%; background: #DFDBD5; border-radius: 4px 4px 0 0;"></div>
+                  <div style="flex: 1; height: 65%; background: #DFDBD5; border-radius: 4px 4px 0 0;"></div>
+                  <div style="flex: 1; height: 80%; background: #DFDBD5; border-radius: 4px 4px 0 0;"></div>
+                  <div style="flex: 1; height: 95%; background: #DFDBD5; border-radius: 4px 4px 0 0;"></div>
+                  <div style="flex: 1; height: 100%; background: var(--j-orange); border-radius: 4px 4px 0 0;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         8. FINANCIAL INTELLIGENCE CANVAS
+         ========================================================================== -->
+    <section class="bl-section" id="financial-intelligence" style="padding-bottom: 130px;">
+      <div class="bl-container">
+        <div style="text-align: center; max-width: 820px; margin: 0 auto 56px auto;">
+          <div class="bl-eyebrow">SEE THE BIGGER PICTURE</div>
+          <h2 class="bl-section-title">Know where your recurring<br />revenue stands.</h2>
+          <p class="bl-lead">
+            Turn subscription activity into a clearer financial picture. Brightloop brings essential revenue and payment information together so your team can make better-informed decisions.
+          </p>
+        </div>
+
+        <div class="bl-fi-dashboard">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 32px; border-bottom: 1px solid var(--j-brown-10);">
+            <div>
+              <div style="font-family: var(--j-font-display); font-size: 1.1rem; font-weight: 800;">Financial Metrics Overview</div>
+              <div style="font-size: 0.78rem; color: var(--j-brown-55);">Integer paise precision • Zero decimal rounding discrepancies</div>
+            </div>
+            <div style="display: flex; background: #EAE7E1; border-radius: 999px; padding: 3px;">
+              <button onclick="toggleRange(this, '6m')" style="padding: 5px 16px; font-size: 0.78rem; font-weight: 800; border-radius: 999px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">6 Months</button>
+              <button onclick="toggleRange(this, '1y')" style="padding: 5px 16px; font-size: 0.78rem; font-weight: 800; border-radius: 999px; background: transparent;">1 Year</button>
+            </div>
+          </div>
+
+          <div class="bl-fi-strip">
+            <div class="bl-fi-cell">
+              <div style="font-size: 0.74rem; font-weight: 800; color: var(--j-brown-55);">MRR</div>
+              <div style="font-family: var(--j-font-display); font-size: 1.55rem; font-weight: 800;">₹4,85,000</div>
+              <div style="font-size: 0.75rem; color: var(--j-green); font-weight: 700;">+18.4% MoM</div>
+            </div>
+            <div class="bl-fi-cell">
+              <div style="font-size: 0.74rem; font-weight: 800; color: var(--j-brown-55);">ARR ESTIMATE</div>
+              <div style="font-family: var(--j-font-display); font-size: 1.55rem; font-weight: 800;">₹58,20,000</div>
+              <div style="font-size: 0.75rem; color: var(--j-green); font-weight: 700;">Normalized</div>
+            </div>
+            <div class="bl-fi-cell">
+              <div style="font-size: 0.74rem; font-weight: 800; color: var(--j-brown-55);">ACTIVE CONTRACTS</div>
+              <div style="font-family: var(--j-font-display); font-size: 1.55rem; font-weight: 800;">1,428</div>
+              <div style="font-size: 0.75rem; color: var(--j-blue); font-weight: 700;">99.2% retained</div>
+            </div>
+            <div class="bl-fi-cell">
+              <div style="font-size: 0.74rem; font-weight: 800; color: var(--j-brown-55);">COLLECTED REVENUE</div>
+              <div style="font-family: var(--j-font-display); font-size: 1.55rem; font-weight: 800;">₹42,10,000</div>
+              <div style="font-size: 0.75rem; color: var(--j-green); font-weight: 700;">94.6% rate</div>
+            </div>
+            <div class="bl-fi-cell">
+              <div style="font-size: 0.74rem; font-weight: 800; color: var(--j-brown-55);">OUTSTANDING</div>
+              <div style="font-family: var(--j-font-display); font-size: 1.55rem; font-weight: 800;">₹1,85,000</div>
+              <div style="font-size: 0.75rem; color: var(--j-amber); font-weight: 700;">4 due this week</div>
+            </div>
+            <div class="bl-fi-cell" style="border-right: none;">
+              <div style="font-size: 0.74rem; font-weight: 800; color: var(--j-brown-55);">OVERDUE (>30D)</div>
+              <div style="font-family: var(--j-font-display); font-size: 1.55rem; font-weight: 800; color: var(--j-orange);">₹42,000</div>
+              <div style="font-size: 0.75rem; color: var(--j-orange); font-weight: 700;">0.9% aged</div>
+            </div>
+          </div>
+
+          <div style="padding: 18px 32px; background: #FFFFFF; display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--j-brown-55);">
+            <span>Illustrative product preview. Relational SQLite engine with WAL journaling.</span>
+            <span style="color: var(--j-orange); font-weight: 700;">Brightloop Financial Operations</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         9. DESIGNED FOR EVERY ROLE
+         ========================================================================== -->
+    <section class="bl-section" id="roles" style="padding: 120px 0; background: var(--j-white); border-top: 1px solid var(--j-brown-10); border-bottom: 1px solid var(--j-brown-10);">
+      <div class="bl-container">
+        <div style="text-align: center; max-width: 820px; margin: 0 auto 56px auto;">
+          <div class="bl-eyebrow">ONE PLATFORM. EVERY TEAM.</div>
+          <h2 class="bl-section-title">The right visibility<br />for every person.</h2>
+          <p class="bl-lead">
+            Built with strict role-based access control. Administrators, operational staff, and customers each get an experience tailored precisely to their responsibilities.
+          </p>
+        </div>
+
+        <div class="bl-roles-grid">
+          <!-- Administrator Role -->
+          <div class="bl-role-card" style="border-top: 5px solid var(--j-brown);">
+            <div>
+              <div style="display:inline-block; font-family: var(--j-font-mono); font-size: 0.72rem; font-weight: 800; background: var(--j-brown-05); color: var(--j-brown); padding: 5px 12px; border-radius: 999px; margin-bottom: 16px;">ROLE: ADMINISTRATOR</div>
+              <h3 style="font-family: var(--j-font-display); font-size: 1.7rem; font-weight: 800; margin-bottom: 8px;">Administrators</h3>
+              <p style="font-size: 0.98rem; color: var(--j-brown-80); line-height: 1.6; margin-bottom: 24px;">
+                Manage the complete subscription operation, configure plans, oversee billing, and monitor business performance.
+              </p>
+            </div>
+            <div style="background: #FAF9F7; border: 1px solid var(--j-brown-05); border-radius: var(--j-radius-16); padding: 18px;">
+              <div style="font-size: 0.72rem; font-weight: 800; color: var(--j-brown-55); margin-bottom: 10px;">ADMIN CONTROLS</div>
+              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                <div style="display: flex; justify-content: space-between; background: #fff; padding: 8px 12px; border-radius: 6px;"><span>Tax & Discount Rules</span><strong style="color: var(--j-green);">Active</strong></div>
+                <div style="display: flex; justify-content: space-between; background: #fff; padding: 8px 12px; border-radius: 6px;"><span>Automated Scheduler</span><strong style="color: var(--j-orange);">Running</strong></div>
+                <div style="display: flex; justify-content: space-between; background: #fff; padding: 8px 12px; border-radius: 6px;"><span>Database Backups</span><strong style="color: var(--j-brown);">Consistent</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Staff Role -->
+          <div class="bl-role-card" style="border-top: 5px solid var(--j-orange);">
+            <div>
+              <div style="display:inline-block; font-family: var(--j-font-mono); font-size: 0.72rem; font-weight: 800; background: rgba(247,59,32,0.08); color: var(--j-orange); padding: 5px 12px; border-radius: 999px; margin-bottom: 16px;">ROLE: STAFF & OPERATIONS</div>
+              <h3 style="font-family: var(--j-font-display); font-size: 1.7rem; font-weight: 800; margin-bottom: 8px;">Staff</h3>
+              <p style="font-size: 0.98rem; color: var(--j-brown-80); line-height: 1.6; margin-bottom: 24px;">
+                Handle day-to-day subscription operations, quotations, invoices, and payment records with the access they need.
+              </p>
+            </div>
+            <div style="background: #FAF9F7; border: 1px solid var(--j-brown-05); border-radius: var(--j-radius-16); padding: 18px;">
+              <div style="font-size: 0.72rem; font-weight: 800; color: var(--j-brown-55); margin-bottom: 10px;">OPERATIONS DECK</div>
+              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                <div style="display: flex; justify-content: space-between; background: #fff; padding: 8px 12px; border-radius: 6px;"><span>Quotation Editor</span><strong style="color: var(--j-blue);">Drafts</strong></div>
+                <div style="display: flex; justify-content: space-between; background: #fff; padding: 8px 12px; border-radius: 6px;"><span>Record Payment</span><strong style="color: var(--j-green);">1-Click</strong></div>
+                <div style="display: flex; justify-content: space-between; background: #fff; padding: 8px 12px; border-radius: 6px;"><span>Print & Dispatch Invoices</span><strong style="color: var(--j-brown);">Active</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer Role -->
+          <div class="bl-role-card" style="border-top: 5px solid var(--j-green);">
+            <div>
+              <div style="display:inline-block; font-family: var(--j-font-mono); font-size: 0.72rem; font-weight: 800; background: rgba(52,199,113,0.12); color: var(--j-green); padding: 5px 12px; border-radius: 999px; margin-bottom: 16px;">ROLE: SUBSCRIBER</div>
+              <h3 style="font-family: var(--j-font-display); font-size: 1.7rem; font-weight: 800; margin-bottom: 8px;">Customers</h3>
+              <p style="font-size: 0.98rem; color: var(--j-brown-80); line-height: 1.6; margin-bottom: 24px;">
+                Access personal subscriptions and invoices through a simple, convenient customer portal with instant statements.
+              </p>
+            </div>
+            <div style="background: #FAF9F7; border: 1px solid var(--j-brown-05); border-radius: var(--j-radius-16); padding: 18px;">
+              <div style="font-size: 0.72rem; font-weight: 800; color: var(--j-brown-55); margin-bottom: 10px;">CUSTOMER SELF-SERVE</div>
+              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                <div style="display: flex; justify-content: space-between; background: #fff; padding: 8px 12px; border-radius: 6px;"><span>Active Plan Details</span><strong style="color: var(--j-green);">Active</strong></div>
+                <div style="display: flex; justify-content: space-between; background: #fff; padding: 8px 12px; border-radius: 6px;"><span>Invoice Statements</span><strong style="color: var(--j-orange);">Download</strong></div>
+                <div style="display: flex; justify-content: space-between; background: #fff; padding: 8px 12px; border-radius: 6px;"><span>Renewal Visibility</span><strong style="color: var(--j-brown);">Anchored</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         10. CLOSING CTA (JETON MISSION INVERT-COLOR BANNER)
+         ========================================================================== -->
+    <section class="bl-closing" id="get-started">
+      <div class="bl-closing-loop-bg" aria-hidden="true">
+        <svg viewBox="0 0 800 800" fill="none" style="width: 100%; height: 100%;">
+          <circle cx="400" cy="400" r="160" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="6 8" />
+          <circle cx="400" cy="400" r="280" stroke="#FFFFFF" stroke-width="3" opacity="0.6" />
+          <path d="M240 480 C 160 480, 100 420, 100 350 C 100 280, 160 220, 240 220 C 340 220, 440 480, 560 480 C 640 480, 700 420, 700 350 C 700 280, 640 220, 560 220 C 440 220, 340 480, 240 480 Z" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.85" />
+        </svg>
+      </div>
+
+      <div class="bl-container" style="position: relative; z-index: 2;">
+        <div class="bl-eyebrow invert">CENTRALIZED SUBSCRIPTION OPERATIONS</div>
+        <h2 style="font-family: var(--j-font-display); font-size: clamp(2.8rem, 5.8vw, 5.4rem); font-weight: 800; line-height: 0.98; letter-spacing: -0.04em; margin-bottom: 24px;">
+          Bring your subscription<br />business into one flow.
+        </h2>
+        <p style="font-size: clamp(1.15rem, 2vw, 1.35rem); line-height: 1.6; color: rgba(255,255,255,0.92); max-width: 660px; margin: 0 auto 42px auto;">
+          Make subscription operations easier to manage, billing easier to follow, and business performance easier to understand.
+        </p>
+
+        <a href="/app" class="bl-closing-btn">
+          <span>Enter Brightloop</span>
+          <span>→</span>
+        </a>
+
+        <div style="margin-top: 36px; font-size: 0.95rem; font-weight: 700; color: rgba(255,255,255,0.88); letter-spacing: 0.05em; text-transform: uppercase;">
+          Your subscription operations, connected.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       11. FOOTER
+       ========================================================================== -->
+  <footer class="bl-footer">
+    <div class="bl-container">
+      <div class="bl-footer-grid">
+        <div>
+          <div class="bl-brand" style="margin-bottom: 18px;">
+            <svg viewBox="0 0 40 40" width="32" height="32" fill="none">
+              <path d="M12 28C7.58 28 4 24.42 4 20C4 15.58 7.58 12 12 12C17.5 12 22.5 28 28 28C32.42 28 36 24.42 36 20C36 15.58 32.42 12 28 12C22.5 12 17.5 28 12 28Z" stroke="#F73B20" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="28" cy="12" r="3" fill="#FFFFFF" stroke="#F73B20" stroke-width="2.5" />
+            </svg>
+            <div style="font-family: var(--j-font-display); font-size: 1.35rem; font-weight: 800;">
+              <span style="color: #fff;">bright</span><span style="color: var(--j-orange);">loop</span>
+            </div>
+          </div>
+          <p style="font-size: 0.92rem; line-height: 1.6; color: #9E988F; max-width: 320px;">
+            Brightloop is a centralized subscription management platform that connects products, plans, subscriptions, billing, payments, and financial visibility.
+          </p>
+        </div>
+
+        <div>
+          <div style="font-family: var(--j-font-display); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 18px;">Platform</div>
+          <ul class="bl-footer-links">
+            <li><a href="#platform">Overview</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#lifecycle">How It Works</a></li>
+            <li><a href="#roles">For Businesses</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div style="font-family: var(--j-font-display); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 18px;">Architecture</div>
+          <ul class="bl-footer-links">
+            <li><a href="#transformation">Transformation</a></li>
+            <li><a href="#financial-intelligence">Financial Insights</a></li>
+            <li><a href="#features">Cadence Engine</a></li>
+            <li><a href="#features">Audit Ledger</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div style="font-family: var(--j-font-display); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 18px;">Access</div>
+          <ul class="bl-footer-links">
+            <li><a href="/auth/login">Sign In</a></li>
+            <li><a href="/app" style="color: #FFA192; font-weight: 700;">Enter Brightloop →</a></li>
+            <li><a href="/privacy">Privacy Policy</a></li>
+            <li><a href="/terms">Terms of Service</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div style="font-family: var(--j-font-display); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 18px;">Direct Workspace</div>
+          <p style="font-size: 0.85rem; color: #9E988F; line-height: 1.5; margin-bottom: 16px;">Launch your local or self-hosted Brightloop operations console.</p>
+          <a href="/app" class="bl-btn-primary" style="padding: 11px 20px; font-size: 0.9rem; width: 100%; justify-content: center;">
+            <span>Launch Workspace ↗</span>
+          </a>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.85rem; color: #7A756E; flex-wrap: wrap; gap: 12px;">
+        <div>© 2026 Brightloop. All rights reserved.</div>
+        <div style="display: flex; gap: 16px;">
+          <span>Subscription Operations, Reimagined</span>
+          <span>•</span>
+          <span>Relational SQLite Core</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       INTERACTIVE JAVASCRIPT & JETON ANIMATION PHYSICS
+       ========================================================================== -->
+  <script>
+    // 1. Sticky Navigation on Scroll
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 20) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    }, { passive: true });
+
+    // 2. Mobile Menu Toggle
+    const mobileToggle = document.getElementById('mobileToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+    function closeMenu() {
+      mobileMenu.classList.remove('open');
+    }
+
+    // 3. Jeton-style Parallax Hover on Hero Universe
+    const heroUniverse = document.getElementById('heroUniverse');
+    const snippets = document.querySelectorAll('.bl-snippet');
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      window.addEventListener('mousemove', (e) => {
+        const x = (e.clientX / window.innerWidth - 0.5) * 20;
+        const y = (e.clientY / window.innerHeight - 0.5) * 20;
+        snippets.forEach((snippet, i) => {
+          const factor = (i + 1) * 0.4;
+          snippet.style.transform = `translate(${x * factor}px, ${y * factor}px)`;
+        });
+      });
+    }
+
+    // 4. Interactive Jeton Switcher Data & State Machine
+    const stagesData = [
+      {
+        num: '01',
+        title: 'Products & Plans',
+        quote: 'Define your products, pricing, and subscription frequencies.',
+        detail: 'Set up product variants, base pricing, and flexible billing cadences (daily, weekly, monthly, or annual). Combine base items with recurring plan fees and active tax rules.',
+        badge: 'Product Catalog & Cadence Engine',
+        features: [
+          'Variant price adjustments & add-on line items',
+          'Cadence support: Daily, Weekly, Monthly, Yearly',
+          'Automatic snapshotted tax rules (GST, VAT, custom)'
+        ],
+        mockTitle: 'Plan Configuration: Cloud Infrastructure Pro',
+        items: [
+          { l: 'Billing Frequency', v: 'Monthly (Clamped end-of-month)' },
+          { l: 'Base Product Price', v: '₹12,000.00 / seat' },
+          { l: 'Variant: High Availability', v: '+ ₹3,500.00' },
+          { l: 'Snapshotted Tax', v: '18% GST (Calculated per line)' }
+        ]
+      },
+      {
+        num: '02',
+        title: 'Quotations',
+        quote: 'Prepare clear subscription quotations for your customers.',
+        detail: 'Draft multi-line quotations with validity dates and customer payment terms. Move seamlessly from Draft to Quotation review, with automated calculation of taxable bases and discount caps.',
+        badge: 'Multi-line Quotation Builder',
+        features: [
+          'Validity date tracking & expiry protection',
+          'Eligible discount rule application (Fixed or %)',
+          'One-click conversion to Confirmed Subscription'
+        ],
+        mockTitle: 'Quotation #Q-2026-0811 — TechFlow Inc.',
+        items: [
+          { l: 'Customer', v: 'TechFlow Solutions (Cust #409)' },
+          { l: 'Validity Period', v: 'Valid until 15 Nov 2026' },
+          { l: 'Discount Applied', v: '10% Early Adopter (Capped)' },
+          { l: 'Net Quotation Total', v: '₹48,200.00' }
+        ]
+      },
+      {
+        num: '03',
+        title: 'Subscriptions',
+        quote: 'Activate, manage, renew, pause, or close subscriptions.',
+        detail: 'Oversee complete subscription state transitions. Anchor renewals, clamp short calendar months, pause without proration penalties, and resume smoothly while keeping full history.',
+        badge: 'Relational Lifecycle State Machine',
+        features: [
+          'Predictive renewal date anchors (Feb 28 / Leap day handling)',
+          'Pause and Resume with skip-period intelligence',
+          'Auto-close rules and renewal cycle additions'
+        ],
+        mockTitle: 'Subscription #SUB-3021: Acme Global',
+        items: [
+          { l: 'Current State', v: 'Active (Cycle 4 of 12)' },
+          { l: 'Anchor Renewal Date', v: 'Last day of month (30 Nov)' },
+          { l: 'Grace Period', v: '7 Days Before Due Date' },
+          { l: 'Auto-Renewal Action', v: 'Generate Invoice & Run Email' }
+        ]
+      },
+      {
+        num: '04',
+        title: 'Recurring Invoices',
+        quote: 'Generate invoices from subscription details and billing schedules.',
+        detail: 'Run batched billing runs across active subscriptions. Atomic SQLite transactions prevent double-billing across concurrent processes. Every invoice preserves immutable tax snapshots.',
+        badge: 'Atomic Billing Run Execution',
+        features: [
+          'Idempotent billing catch-up (up to 100 periods)',
+          'Unique subscription-period index (zero double bills)',
+          'Dedicated printable invoices and email dispatch logs'
+        ],
+        mockTitle: 'Invoice #INV-2026-0492 Generated',
+        items: [
+          { l: 'Billing Period', v: '01 Nov 2026 – 30 Nov 2026' },
+          { l: 'Invoice Status', v: 'CONFIRMED' },
+          { l: 'Line Items Sum', v: '₹28,500.00' },
+          { l: 'Total Due', v: '₹33,630.00 (Incl. 18% GST)' }
+        ]
+      },
+      {
+        num: '05',
+        title: 'Payments',
+        quote: 'Record payments and keep outstanding balances visible.',
+        detail: 'Record customer payments via bank transfer, card, or offline methods. Automatically link payments directly to invoices, track outstanding balances in real-time, and handle audited reversals.',
+        badge: 'Unified Payment & Ledger Service',
+        features: [
+          'Full and partial payment ledger recording',
+          'Immediate outstanding balance reconciliation',
+          'Audited payment reversals with reason tracking'
+        ],
+        mockTitle: 'Payment Record #PAY-9921',
+        items: [
+          { l: 'Payment Method', v: 'Bank NEFT / Wire Transfer' },
+          { l: 'Amount Allocated', v: '₹33,630.00' },
+          { l: 'Linked Invoice', v: '#INV-2026-0492 (Status: PAID)' },
+          { l: 'Outstanding Balance', v: '₹0.00 (Fully Settled)' }
+        ]
+      },
+      {
+        num: '06',
+        title: 'Financial Insights',
+        quote: 'Understand recurring revenue, collections, and overdue payments.',
+        detail: 'Gain complete executive visibility over Monthly Recurring Revenue (MRR), Annual Recurring Revenue (ARR), collection efficiency, overdue invoices, and ageing analysis in one dashboard.',
+        badge: 'Real-time Financial Intelligence',
+        features: [
+          'Normalized recurring contract estimates',
+          'Overdue debt ageing (0-30, 31-60, 60+ days)',
+          'CSV export neutralization and audit log trails'
+        ],
+        mockTitle: 'Executive Financial Summary',
+        items: [
+          { l: 'Current MRR', v: '₹4,85,000 (+18.4% MoM)' },
+          { l: 'Contract ARR', v: '₹58,20,000' },
+          { l: 'Collection Rate', v: '94.6% of billed invoices' },
+          { l: 'Active Retained Base', v: '1,428 business subscribers' }
+        ]
+      }
+    ];
+
+    function renderStage(idx) {
+      const data = stagesData[idx];
+      const itemsHtml = data.items.map(it => `
+        <div style="display:flex; justify-content:space-between; padding:12px 16px; background:#fff; border-radius:10px; border:1px solid var(--j-brown-05); font-size:0.85rem;">
+          <span style="color:var(--j-brown-55);">${it.l}</span>
+          <strong style="${it.v.includes('₹') ? 'color:var(--j-orange); font-family:var(--j-font-mono);' : ''}">${it.v}</strong>
+        </div>
+      `).join('');
+
+      const featsHtml = data.features.map(f => `
+        <div style="display:flex; align-items:center; gap:10px; font-size:0.92rem; margin-bottom:8px;">
+          <span style="color:var(--j-green); font-weight:800;">✓</span>
+          <span>${f}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('stageCanvas').innerHTML = `
+        <div>
+          <div style="display:inline-block; font-size:0.75rem; font-weight:800; color:var(--j-orange); background:rgba(247,59,32,0.08); padding:5px 14px; border-radius:999px; margin-bottom:16px;">
+            🛡️ ${data.badge}
+          </div>
+          <h3 style="font-family:var(--j-font-display); font-size:2.2rem; font-weight:800; margin-bottom:12px;">${data.title}</h3>
+          <p style="font-size:1.15rem; font-weight:700; color:var(--j-orange); margin-bottom:16px;">"${data.quote}"</p>
+          <p style="font-size:0.98rem; color:var(--j-brown-80); line-height:1.6; margin-bottom:24px;">${data.detail}</p>
+          <div style="margin-bottom:28px;">${featsHtml}</div>
+          <button class="bl-btn-secondary" onclick="switchStage(${(idx + 1) % 6})" style="padding:12px 24px; font-size:0.92rem;">
+            <span>Next: ${stagesData[(idx + 1) % 6].title} →</span>
+          </button>
+        </div>
+        <div style="background:#FFFFFF; border-radius:var(--j-radius-24); border:1px solid var(--j-brown-10); padding:28px; box-shadow:var(--j-shadow-md);">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--j-brown-05); padding-bottom:14px; margin-bottom:18px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-family:var(--j-font-mono); font-size:0.78rem; font-weight:800; background:var(--j-orange); color:#fff; padding:3px 10px; border-radius:6px;">STAGE ${data.num}</span>
+              <strong style="font-size:0.92rem;">${data.mockTitle}</strong>
+            </div>
+            <span style="width:9px; height:9px; border-radius:50%; background:var(--j-green); box-shadow:0 0 6px var(--j-green);"></span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px;">${itemsHtml}</div>
+          <div style="margin-top:20px; padding:12px 16px; background:#FAF9F7; border-radius:8px; font-size:0.78rem; color:var(--j-brown-55); display:flex; justify-content:space-between;">
+            <span>Database: SQLite WAL Mode</span>
+            <span style="color:var(--j-green); font-weight:700;">Zero Sync Latency</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function switchStage(idx) {
+      const btns = document.querySelectorAll('.bl-switcher-btn');
+      btns.forEach((b, i) => {
+        if (i === idx) b.classList.add('active');
+        else b.classList.remove('active');
+      });
+      renderStage(idx);
+    }
+
+    renderStage(0);
+
+    // 5. Interactive Plan Frequency Switcher
+    function setPlan(btn, price) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('button').forEach(b => {
+        b.style.background = 'transparent';
+        b.style.boxShadow = 'none';
+      });
+      btn.style.background = '#FFFFFF';
+      btn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+      document.getElementById('planPrice').textContent = price;
+    }
+
+    // 6. Interactive Financial Range Switcher
+    function toggleRange(btn, range) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('button').forEach(b => {
+        b.style.background = 'transparent';
+        b.style.boxShadow = 'none';
+      });
+      btn.style.background = '#FFFFFF';
+      btn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+    }
+  </script>
+</body>
+</html>
