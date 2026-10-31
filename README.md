@@ -1,6 +1,6 @@
 # Brightloop
 
-Brightloop is a local-first, self-hosted subscription operations application built with Next.js App Router, React, TypeScript and Node 24 SQLite. Payments record money collected elsewhere; this application does not charge cards or transfer funds.
+Brightloop is a local-first, self-hosted subscription operations application built with Next.js App Router, React, TypeScript and Node 24 SQLite. Payments record money collected elsewhere; this application does not charge cards / transfer funds.
 
 ## Start reviewing here
 
