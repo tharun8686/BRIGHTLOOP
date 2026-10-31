@@ -1,0 +1,4 @@
+'use client';
+import { useActionState } from 'react';
+import { createStaff } from '@/app/staff-actions';
+export function StaffForm(){const [state,action,pending]=useActionState(createStaff,undefined);return <form action={action} className="form narrow"><label>Full name<input name="name" required maxLength={160}/></label><label>Email address<input name="email" type="email" required/></label><label>Initial password<input name="password" type="password" autoComplete="new-password" minLength={9} maxLength={128} required/></label><small>At least 9 characters with uppercase, lowercase and a special character. Share access details securely with the staff member.</small>{state?.error&&<p className="error" role="alert">{state.error}</p>}{state?.success&&<p className="success" role="status">Staff account created. They can now sign in using the shared login page.</p>}<button disabled={pending}>{pending?'Creating account…':'Create staff account'}</button></form>}

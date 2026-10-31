@@ -1,0 +1,33 @@
+{
+  "name": "brightloop-subscriptions",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "next": "^16.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zod": "^4.3.0",
+    "@supabase/supabase-js": "^2.90.0",
+    "@supabase/ssr": "^0.8.0",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "react-hook-form": "^7.71.0",
+    "@hookform/resolvers": "^5.2.2",
+    "nodemailer": "^7.0.12",
+    "postgres": "^3.4.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/nodemailer": "^7.0.4",
+    "tsx": "^4.21.0"
+  }
+}

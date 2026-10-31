@@ -1,0 +1,4 @@
+'use client';
+import { useActionState } from 'react';
+import { requestReset,resetPassword } from '@/app/recovery-actions';
+export function RecoveryForm({token}:{token?:string}){const [state,action,pending]=useActionState(token?resetPassword:requestReset,undefined);return <form action={action} className="form">{token?<><input name="token" value={token} type="hidden"/><label>New password<input name="password" type="password" autoComplete="new-password" minLength={9} maxLength={128} required/></label><label>Confirm new password<input name="confirmation" type="password" autoComplete="new-password" required/></label></>:<label>Email address<input name="email" type="email" autoComplete="email" required/></label>}{state?.error&&<p className="error" role="alert">{state.error}</p>}{state?.success&&<p className="success" role="status">{state.success}</p>}<button disabled={pending}>{pending?'Please wait…':token?'Update password':'Request reset link'}</button></form>}
